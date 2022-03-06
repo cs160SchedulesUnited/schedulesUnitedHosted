@@ -8,6 +8,12 @@ a, .btn-link {
     color: #0366d6;
 }
 
+.texts {
+    color: white;
+    display: flex;
+    text-color align-items: center;
+}
+
 .btn-primary {
     color: #fff;
     background-color: #1b6ec2;
@@ -73,6 +79,7 @@ app {
         .sidebar .nav-item:first-of-type {
             padding-top: 1rem;
         }
+        
 
         .sidebar .nav-item:last-of-type {
             padding-bottom: 1rem;
