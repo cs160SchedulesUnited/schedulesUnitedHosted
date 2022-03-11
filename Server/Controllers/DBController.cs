@@ -8,21 +8,23 @@ using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 using schedulesUnitedHosted.Server;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
 namespace schedulesUnitedHosted.Server.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class DBComController : ControllerBase
     {
-        // GET: api/<DBController>
+        // GET: <DBController>
         [HttpGet]
-        public String Test()
+        public String Get()
         {
+            return "API IS SEEN";
             //TODO: Make this an env variable if possible, our connection string should not be publicly visible
-            DBCon conGen = new DBCon("server=cs160-db.cocfzrdakcvx.us-west1.rds.amazonaws.com;port=3306;database=newschema;user=admin;password=CS160DBCon");
+            System.Diagnostics.Debug.WriteLine("First");
+            DBCon conGen = new DBCon("server=cs160-db.cocfzrdakcvx.us-west-1.rds.amazonaws.com;port=3306;database=newschema;user=admin;password=CS160DBCon");
+            System.Diagnostics.Debug.WriteLine("Second");
             MySqlConnection con = conGen.GetConnection();
+            System.Diagnostics.Debug.WriteLine("Third");
             return "Connection Successful";
         } 
 
@@ -41,6 +43,7 @@ namespace schedulesUnitedHosted.Server.Controllers
         [HttpPost]
         public void Post([FromBody] string value)
         {
+            //TODO: Create behavior to accept posted data and submit a db query to add the response
         }
     }
 }
