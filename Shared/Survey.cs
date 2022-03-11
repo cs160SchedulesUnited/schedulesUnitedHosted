@@ -17,5 +17,15 @@ namespace schedulesUnitedHosted.Shared
         public int id { get; set; }
 
         public string name { get; set; }
+
+        public Survey(Response[] Responses, DateTime start, DateTime end, string host, int id, string name)
+        {
+            this.Responses = Responses;
+            this.start = start;
+            this.end = end;
+            this.host = host;
+            this.id = id;
+            this.name = name;
+        }
     }
 }

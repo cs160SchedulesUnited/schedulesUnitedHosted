@@ -10,21 +10,25 @@ using schedulesUnitedHosted.Server;
 
 namespace schedulesUnitedHosted.Server.Controllers
 {
-    [Route("[controller]")]
     [ApiController]
-    public class DBComController : ControllerBase
+    [Route("[controller]")]
+    public class DBController : ControllerBase
     {
+
         // GET: <DBController>
         [HttpGet]
         public String Get()
         {
-            return "API IS SEEN";
             //TODO: Make this an env variable if possible, our connection string should not be publicly visible
-            System.Diagnostics.Debug.WriteLine("First");
-            DBCon conGen = new DBCon("server=cs160-db.cocfzrdakcvx.us-west-1.rds.amazonaws.com;port=3306;database=newschema;user=admin;password=CS160DBCon");
-            System.Diagnostics.Debug.WriteLine("Second");
+            string conString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
+            DBCon conGen = new DBCon(conString);
             MySqlConnection con = conGen.GetConnection();
-            System.Diagnostics.Debug.WriteLine("Third");
+            using (con)
+            {
+                con.Open();
+                MySqlCommand test = new MySqlCommand("");
+                con.Close();
+            }
             return "Connection Successful";
         } 
 
@@ -35,7 +39,7 @@ namespace schedulesUnitedHosted.Server.Controllers
             //TODO: Define variables to store query data
             //TODO: Create a DB query for event id $id
             //TODO: Create a survey object to return to front end that stores the query data
-            var request = new Survey(/* Query Data */);
+            var request = new Survey(/* Fill this with actual query data */null, new DateTime(), new DateTime(), null, 0, null);
             return request;
         }
 

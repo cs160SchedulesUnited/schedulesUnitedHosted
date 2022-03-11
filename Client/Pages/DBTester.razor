@@ -20,7 +20,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        resp = await Http.GetStringAsync("DB");
+        resp = await Http.GetFromJsonAsync<String>("DB");
     }
 
 }
