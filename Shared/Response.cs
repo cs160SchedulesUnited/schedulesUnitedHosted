@@ -12,5 +12,12 @@ namespace schedulesUnitedHosted.Shared
 
         public DateTime[] Availabilities { get; set; }
 
+        public Response(string AccId, string EventId, DateTime[] Availabilities)
+        {
+            this.AccId = AccId;
+            this.EventId = EventId;
+            this.Availabilities = Availabilities;
+        }
+
     }
 }
