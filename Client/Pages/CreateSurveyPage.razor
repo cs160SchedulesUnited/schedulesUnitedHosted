@@ -1,0 +1,42 @@
+﻿@page "/createSurvey"
+
+
+<h1>Create Survey for participants</h1>
+
+<form>
+    <div>
+        <label>Name Of Event</label>
+        <input type="text" />
+    </div>
+    <div>
+        <label>Start Date</label>
+        <input type="date"/>
+    </div>
+    <div>
+        <label>End Date</label>
+        <input type="date"/>
+    </div>
+    <div>
+        <label>Date Requested Type</label>
+        <div>
+            <input type="radio" checked>
+            <label>Date</label>
+        </div>
+
+        <div>
+            <input type="radio" >
+            <label>Time</label>
+        </div>
+
+    </div>
+    <div>
+        <label>Input Emails</label>
+        <input type="email" multiple />
+    </div>
+    <button>Create</button>
+</form>
+
+
+@code {
+
+}
