@@ -35,24 +35,6 @@ namespace schedulesUnitedHosted.Server.Controllers
                 con.Close();
             }
             return "Connection Successful";
-        } 
-
-        // GET api/<DBController>/5
-        [HttpGet("{id}")]
-        public Survey Get(int id)
-        {
-            //TODO: Define variables to store query data
-            //TODO: Create a DB query for event id $id
-            //TODO: Create a survey object to return to front end that stores the query data
-            var request = new Survey(/* Fill this with actual query data */null, new DateTime(), new DateTime(), null, 0, null);
-            return request;
-        }
-
-        // POST api/<DBController>
-        [HttpPost]
-        public void Post([FromBody] string value)
-        {
-            //TODO: Create behavior to accept posted data and submit a db query to add the response
         }
     }
 }

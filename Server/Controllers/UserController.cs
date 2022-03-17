@@ -14,11 +14,12 @@ namespace schedulesUnitedHosted.Server.Controllers
         // GET: api/<UserController>
         [HttpGet]
         
-        // GET api/<UserController>/{#}
-        [HttpGet("{id}")]
-        public User getUserInfo(string id)
+        // TODO: Test this API
+        // GET <UserController>/{#}
+        [HttpGet("{un}")]
+        public User getUserInfo(string un)
         {
-            string cleaned = DBCon.Clean(id);
+            string cleaned = DBCon.Clean(un);
 
             string conString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
             DBCon conGen = new DBCon(conString);
@@ -27,36 +28,52 @@ namespace schedulesUnitedHosted.Server.Controllers
             using (con)
             {
                 con.Open();
-                //TODO: write the SQL query that will request the user with the matching userID
-                MySqlCommand test = new MySqlCommand("");
+                MySqlCommand test = new MySqlCommand($"SELECT * FROM Accounts WHERE username = {un}");
                 using (var reader = test.ExecuteReader())
                     while (reader.Read())
                     {
-                        ret = new User(reader["accountID"].ToString(), reader["name"].ToString(), reader["username"].ToString(), reader["password"].ToString());
+                        ret = new User(Int32.Parse(reader["accountID"].ToString()), reader["name"].ToString(), reader["username"].ToString(), reader["password"].ToString());
                     }
                 con.Close();
             }
             return ret;
         }
 
-        // POST api/<ValuesController>
+        // TODO: Test this API
+        // POST <UserController>/
         [HttpPost]
         public void Post([FromBody] User person)
         {
             User cleaned = DBCon.Clean(person);
-
+            User ret = null;
             string conString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
             DBCon conGen = new DBCon(conString);
             MySqlConnection con = conGen.GetConnection();
             using (con)
             {
                 con.Open();
-                string id = person.accountID;
+                int id = person.accountID;
                 string name = person.name;
                 string username = person.username;
                 string password = person.password;
                 //TODO: write the SQL query that will insert the user into the DB
-                MySqlCommand test = new MySqlCommand("");
+                MySqlCommand check = new MySqlCommand($"SELECT * FROM Accounts WHERE username = {username}");
+                using (var reader = check.ExecuteReader())
+                    while (reader.Read())
+                    {
+                        ret = new User(Int32.Parse(reader["accountID"].ToString()), reader["name"].ToString(), reader["username"].ToString(), reader["password"].ToString());
+                    }
+                if(ret.Equals(null))
+                {
+                    //Create user
+                    MySqlCommand createUser = new MySqlCommand($"INSERT INTO Accounts VALUES (NULL, {name}, {username}, {password})");
+                    createUser.ExecuteNonQuery();
+                }
+                else
+                {
+                    //Do nothing, return error, user already exists
+                    throw new Exception("User already exists");
+                }
                 con.Close();
             }
         }

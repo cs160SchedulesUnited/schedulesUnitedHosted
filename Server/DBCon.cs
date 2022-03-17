@@ -32,7 +32,7 @@ namespace schedulesUnitedHosted.Server
 
         static public User Clean(User u)
         {
-            u.accountID = Clean(u.accountID);
+            u.accountID = u.accountID;
             u.name = Clean(u.name);
             u.username = Clean(u.username);
             //While we should check the password, I want to see if we can find a way to handle it such that we don't have to validate it for sql injection
