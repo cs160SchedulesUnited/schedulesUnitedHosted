@@ -27,6 +27,11 @@ namespace schedulesUnitedHosted.Server.Controllers
             {
                 con.Open();
                 MySqlCommand test = new MySqlCommand("");
+                using (var reader = test.ExecuteReader())
+                    while (reader.Read())
+                    {
+                        //handle all the responses from the DB here
+                    }
                 con.Close();
             }
             return "Connection Successful";
