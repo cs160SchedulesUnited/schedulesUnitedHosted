@@ -12,13 +12,13 @@ namespace schedulesUnitedHosted.Shared
 
         public DateTime end { get; set; }
 
-        public string host { get; set; }
+        public int host { get; set; }
 
         public int id { get; set; }
 
         public string name { get; set; }
 
-        public Survey(Response[] Responses, DateTime start, DateTime end, string host, int id, string name)
+        public Survey(int id, string name, DateTime start, DateTime end, int host, Response[] Responses)
         {
             this.Responses = Responses;
             this.start = start;
