@@ -6,7 +6,7 @@ namespace schedulesUnitedHosted.Shared
 {
     public class Survey
     {
-        public Response[] Responses { get; set; }
+        public List<Response> Responses { get; set; }
 
         public DateTime start { get; set; }
 
@@ -18,7 +18,7 @@ namespace schedulesUnitedHosted.Shared
 
         public string name { get; set; }
 
-        public Survey(int id, string name, DateTime start, DateTime end, int host, Response[] Responses)
+        public Survey(int id, string name, DateTime start, DateTime end, int host, List<Response> Responses)
         {
             this.Responses = Responses;
             this.start = start;

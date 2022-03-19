@@ -21,17 +21,24 @@ namespace schedulesUnitedHosted.Server.Controllers
         {
             //TODO: Make this an env variable if possible, our connection string should not be publicly visible
             string conString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
-            DBCon conGen = new DBCon(conString);
-            MySqlConnection con = conGen.GetConnection();
+            MySqlConnection con = new MySqlConnection(conString);
             using (con)
             {
                 con.Open();
-                MySqlCommand test = new MySqlCommand("");
-                using (var reader = test.ExecuteReader())
-                    while (reader.Read())
+                MySqlCommand test = new MySqlCommand("USE newschema;SELECT version();", con);
+                try
+                {
+                    MySqlDataReader reader = test.ExecuteReader();
+                    while(reader.Read())
                     {
-                        //handle all the responses from the DB here
+                        Console.Write(reader["version()"]);
                     }
+                }catch(Exception e)
+                {
+                    Console.Write(con.State + "\n");
+                    Console.Write(e.Message + "\n");
+                }
+                
                 con.Close();
             }
             return "Connection Successful";

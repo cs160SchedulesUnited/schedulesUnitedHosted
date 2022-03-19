@@ -20,5 +20,18 @@ namespace schedulesUnitedHosted.Shared
             this.username = username;
             this.password = password;
         }
+
+        public User(string name, string username, string password)
+        {
+            this.accountID = 0;
+            this.name = name;
+            this.username = username;
+            this.password = password;
+        }
+        
+        public string toString()
+        {
+            return $"accID: {accountID}, name: {name}, un: {username}, pw: {password}";
+        }
     }
 }

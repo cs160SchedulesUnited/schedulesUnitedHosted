@@ -2,6 +2,7 @@
 using System;
 using Microsoft.AspNetCore.Mvc;
 using MySql.Data.MySqlClient;
+using System.Collections.Generic;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -17,9 +18,9 @@ namespace schedulesUnitedHosted.Server.Controllers
         //TODO: createOne(), editOne(string id, User person), deleteOne(string id, User person)
 
         // Helper method, to get all responses to the given survey
-        public Response[] getAllResponses(int eventID)
+        public List<Response> getAllResponses(int eventID)
         {
-            Response[] ret = null;
+            List<Response> ret = null;
             string conString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
 
             DBCon conGen = new DBCon(conString);
@@ -28,7 +29,7 @@ namespace schedulesUnitedHosted.Server.Controllers
             using (con)
             {
                 con.Open();
-                MySqlCommand getResponses = new MySqlCommand($"SELECT * FROM Availabilities WHERE eventID = {eventID}");
+                MySqlCommand getResponses = new MySqlCommand($"SELECT * FROM Availabilities WHERE eventID = {eventID}", con);
                 int i = 0;
                 using (var reader = getResponses.ExecuteReader())
                     while (reader.Read())
@@ -46,10 +47,10 @@ namespace schedulesUnitedHosted.Server.Controllers
         }
 
         // GET <SurveyController>/surveys/{username}
-        [HttpGet("/surveys/{userID: int}")]
-        public Survey[] getAllSurvey(int userID)
+        [HttpGet("/surveys/{userID:int}")]
+        public List<Survey> getAllSurvey(int userID)
         {
-            Survey[] ret = null;
+            List<Survey> ret = null;
             string conString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
 
             DBCon conGen = new DBCon(conString);
@@ -58,7 +59,7 @@ namespace schedulesUnitedHosted.Server.Controllers
             using (con)
             {
                 con.Open();
-                MySqlCommand getSurvey = new MySqlCommand($"SELECT * FROM CalendarEvents WHERE eventHost = {userID}");
+                MySqlCommand getSurvey = new MySqlCommand($"SELECT * FROM CalendarEvents WHERE eventHost = {userID}", con);
                 int i = 0;
                 using (var reader = getSurvey.ExecuteReader())
                     while (reader.Read())
@@ -68,7 +69,7 @@ namespace schedulesUnitedHosted.Server.Controllers
                         DateTime start = DateTime.Parse(reader["startDate"].ToString());
                         DateTime end = DateTime.Parse(reader["endDate"].ToString());
                         int host = Int32.Parse(reader["eventHost"].ToString());
-                        Response[] responses = getAllResponses(Int32.Parse(reader["eventID"].ToString()));
+                        List<Response> responses = getAllResponses(Int32.Parse(reader["eventID"].ToString()));
 
                         ret[i] = new Survey(id, name, start, end, host, responses);
                         i++;
@@ -79,7 +80,7 @@ namespace schedulesUnitedHosted.Server.Controllers
         }
 
         // GET <SurveyController>/survey/{surveyID}
-        [HttpGet("survey/{surveyID: int}")]
+        [HttpGet("survey/{surveyID:int}")]
         public Survey getOneSurvey(int surveyID)
         {
             int cleaned = surveyID;
@@ -92,7 +93,7 @@ namespace schedulesUnitedHosted.Server.Controllers
             using (con)
             {
                 con.Open();
-                MySqlCommand getSurvey = new MySqlCommand($"SELECT * FROM CalendarEvents WHERE eventID = {cleaned}");
+                MySqlCommand getSurvey = new MySqlCommand($"SELECT * FROM CalendarEvents WHERE eventID = {cleaned}", con);
                 using (var reader = getSurvey.ExecuteReader())
                     while (reader.Read())
                     {
@@ -101,7 +102,7 @@ namespace schedulesUnitedHosted.Server.Controllers
                         DateTime start = DateTime.Parse(reader["startDate"].ToString());
                         DateTime end = DateTime.Parse(reader["endDate"].ToString());
                         int host = Int32.Parse(reader["eventHost"].ToString());
-                        Response[] responses = getAllResponses(Int32.Parse(reader["eventID"].ToString()));
+                        List<Response> responses = getAllResponses(Int32.Parse(reader["eventID"].ToString()));
 
                         ret = new Survey(id, name, start, end, host, responses);
                     }
@@ -110,35 +111,51 @@ namespace schedulesUnitedHosted.Server.Controllers
             return ret;
         }
 
-        // GET <SurveyController>/{surveyID}/{username}
-        [HttpGet("{surveyID: int}/{accountID: int}")]
-        public Response[] getUsersResponses(int surveyID, string accountID)
+        // GET <SurveyController>/survey/{surveyName}/{ownerID}
+        [HttpGet("survey/{surveyName}/{ownerID:int}")]
+        public int getSurveyID(string surveyName, int ownerID)
         {
-            Response[] all = getAllResponses(surveyID);
-            Response[] ret = new Response[all.Length];
-            int c = 0;
-            // iterate through all responses
-            for(int i = 0; i < all.Length; i++)
+            string cleaned = DBCon.Clean(surveyName);
+            int ret = 0;
+            string conString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
+
+            DBCon conGen = new DBCon(conString);
+            MySqlConnection con = conGen.GetConnection();
+
+            using (con)
             {
-                // if the response is from the requested user it adds it to the list
-                if(all[i].AccId == accountID)
+                con.Open();
+                MySqlCommand getSurvey = new MySqlCommand($"SELECT eventID FROM CalendarEvents WHERE eventName = '{cleaned}' & eventHost = {ownerID}", con);
+                using (var reader = getSurvey.ExecuteReader())
+                    while (reader.Read())
+                    {
+                        ret = Int32.Parse(reader["eventID"].ToString());
+                    }
+                con.Close();
+            }
+            return ret;
+        }
+
+        // GET <SurveyController>/{surveyID}/{username}
+        [HttpGet("{surveyID:int}/{accountID:int}")]
+        public List<Response> getUsersResponses(int surveyID, int accountID)
+        {
+            List<Response> ret = getAllResponses(surveyID);
+            // iterate through all responses
+            for(int i = 0; i < ret.Count; i++)
+            {
+                // if the response isn't from the requested user it removes it from the list
+                if(ret[i].AccId == accountID)
                 {
-                    ret[c] = all[i];
-                    c++;
+                    ret.RemoveAt(i);
                 }
             }
-            // make all a smaller array such that it will be full.
-            all = new Response[c];
-            for(int i = 0; i < c; i++)
-            {
-                all[i] = ret[i];
-            }
-            return all;
+            return ret;
         }
 
         // POST <SurveyController>
-        [HttpPost("create")]
-        public void createSurvey([FromBody] Survey create)
+        [HttpPost("respond")]
+        public void createResponse([FromBody] Response create)
         {
             string conString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
             DBCon conGen = new DBCon(conString);
@@ -147,7 +164,24 @@ namespace schedulesUnitedHosted.Server.Controllers
             {
                 con.Open();
                 //Create survey
-                MySqlCommand createSurvey = new MySqlCommand($"INSERT INTO CalendarEvents VALUES (NULL, '{create.name}', '{create.start}', '{create.end}', '{create.host}')");
+                MySqlCommand createSurvey = new MySqlCommand($"INSERT INTO Availabilities VALUES ({create.AccId}, {create.EventId}, '{create.Availability.ToString()}', {create.Hour})", con);
+                createSurvey.ExecuteNonQuery();
+                con.Close();
+            }
+        }
+
+        // POST <SurveyController>
+        [HttpPost("create")]
+        public void CreateSurvey([FromBody] Survey create)
+        {
+            string conString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
+            DBCon conGen = new DBCon(conString);
+            MySqlConnection con = conGen.GetConnection();
+            using (con)
+            {
+                con.Open();
+                //Create survey
+                MySqlCommand createSurvey = new MySqlCommand($"INSERT INTO CalendarEvents VALUES (NULL, '{create.name}', '{create.start}', '{create.end}', '{create.host}')", con);
                 createSurvey.ExecuteNonQuery();
                 con.Close();
             }
@@ -155,15 +189,17 @@ namespace schedulesUnitedHosted.Server.Controllers
 
         // POST <SurveyController>
         [HttpPost("edit")]
-        public void editSurvey([FromBody] Survey edit, [FromBody] User owner)
+        public void EditSurvey([FromBody] UserSurvey combined)
         {
-            deleteSurvey(edit.id, owner);
-            createSurvey(edit);
+            User owner = combined.user;
+            Survey edit = combined.survey;
+            DeleteSurvey(edit.id, owner);
+            CreateSurvey(edit);
         }
 
         // POST <SurveyController>
-        [HttpPost("delete")]
-        public void deleteSurvey([FromBody] int id, [FromBody] User owner)
+        [HttpPost("delete/{id:int}")]
+        public void DeleteSurvey(int id, [FromBody] User owner)
         {
             User cleaned = DBCon.Clean(owner);
             if(getOneSurvey(id).host == cleaned.accountID)
@@ -175,7 +211,7 @@ namespace schedulesUnitedHosted.Server.Controllers
                 {
                     con.Open();
                     //Delete survey
-                    MySqlCommand deleteSurvey = new MySqlCommand($"DELETE FROM CalendarEvents WHERE eventID = {id}");
+                    MySqlCommand deleteSurvey = new MySqlCommand($"DELETE FROM CalendarEvents WHERE eventID = {id}", con);
                     deleteSurvey.ExecuteNonQuery();
                     con.Close();
                 }

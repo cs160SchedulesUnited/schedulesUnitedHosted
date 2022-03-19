@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "schedulesUnitedHosted.Clien
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "schedulesUnitedHosted.Shared", "Shared\schedulesUnitedHosted.Shared.csproj", "{3C91BAAA-B9ED-46F7-8C10-77B8C495028B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "schedulesUnitedHosted.Tests", "schedulesUnitedHosted.Tests\schedulesUnitedHosted.Tests.csproj", "{F32E89BC-CC12-41FD-BAAA-215C172ADB9B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{3C91BAAA-B9ED-46F7-8C10-77B8C495028B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3C91BAAA-B9ED-46F7-8C10-77B8C495028B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3C91BAAA-B9ED-46F7-8C10-77B8C495028B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F32E89BC-CC12-41FD-BAAA-215C172ADB9B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F32E89BC-CC12-41FD-BAAA-215C172ADB9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F32E89BC-CC12-41FD-BAAA-215C172ADB9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F32E89BC-CC12-41FD-BAAA-215C172ADB9B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

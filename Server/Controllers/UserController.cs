@@ -11,7 +11,9 @@ namespace schedulesUnitedHosted.Server.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        // TODO: Test this API
+
+        public UserController() { }
+
         // This API should not be used for validation
         // GET <UserController>/{username}
         [HttpGet("{username}")]
@@ -26,18 +28,17 @@ namespace schedulesUnitedHosted.Server.Controllers
             using (con)
             {
                 con.Open();
-                MySqlCommand test = new MySqlCommand($"SELECT * FROM Accounts WHERE username = '{cleaned}'");
+                MySqlCommand test = new MySqlCommand($"SELECT * FROM Accounts WHERE username = '{cleaned}'", con);
                 using (var reader = test.ExecuteReader())
                     while (reader.Read())
                     {
-                        ret = new User(Int32.Parse(reader["accountID"].ToString()), reader["name"].ToString(), reader["username"].ToString(), reader["password"].ToString());
+                        ret = new User(Int32.Parse(reader["accountID"].ToString()), reader["personName"].ToString(), reader["username"].ToString(), reader["accountPassword"].ToString());
                     }
                 con.Close();
             }
             return ret;
         }
 
-        // TODO: Test this API
         // If this returns 0, the user was not found
         // GET <UserController>/id/{username}
         [HttpGet("id/{username}")]
@@ -52,18 +53,17 @@ namespace schedulesUnitedHosted.Server.Controllers
             using (con)
             {
                 con.Open();
-                MySqlCommand test = new MySqlCommand($"SELECT accountID FROM Accounts WHERE username = '{cleaned}'");
+                MySqlCommand test = new MySqlCommand($"SELECT accountID FROM Accounts WHERE username = '{cleaned}'", con);
                 using (var reader = test.ExecuteReader())
                     while (reader.Read())
                     {
-                        ret = Int32.Parse(reader["accountID"].ToString();
+                        ret = Int32.Parse(reader["accountID"].ToString());
                     }
                 con.Close();
             }
             return ret;
         }
 
-        // TODO: Test this API
         // POST <UserController>
         [HttpPost]
         public void createUser([FromBody] User person)
@@ -80,17 +80,16 @@ namespace schedulesUnitedHosted.Server.Controllers
                 string name = person.name;
                 string username = person.username;
                 string password = person.password;
-                //TODO: write the SQL query that will insert the user into the DB
-                MySqlCommand check = new MySqlCommand($"SELECT * FROM Accounts WHERE username = '{username}'");
+                MySqlCommand check = new MySqlCommand($"SELECT * FROM Accounts WHERE username = '{username}'", con);
                 using (var reader = check.ExecuteReader())
                     while (reader.Read())
                     {
-                        ret = new User(Int32.Parse(reader["accountID"].ToString()), reader["name"].ToString(), reader["username"].ToString(), reader["password"].ToString());
+                        ret = new User(Int32.Parse(reader["accountID"].ToString()), reader["personName"].ToString(), reader["username"].ToString(), reader["accountPassword"].ToString());
                     }
-                if (ret.Equals(null))
+                if (ret == null)
                 {
                     //Create user
-                    MySqlCommand createUser = new MySqlCommand($"INSERT INTO Accounts VALUES (NULL, '{name}', '{username}', '{password}')");
+                    MySqlCommand createUser = new MySqlCommand($"INSERT INTO Accounts VALUES (NULL, '{name}', '{username}', '{password}')", con);
                     createUser.ExecuteNonQuery();
                 }
                 else
@@ -102,10 +101,38 @@ namespace schedulesUnitedHosted.Server.Controllers
             }
         }
 
-        // TODO: Test this API
+        // POST <UserController>/delete
+        [HttpPost("/delete")]
+        public void deleteUser([FromBody] User person)
+        {
+            User cleaned = DBCon.Clean(person);
+            User ret = null;
+            string conString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
+            DBCon conGen = new DBCon(conString);
+            MySqlConnection con = conGen.GetConnection();
+            using (con)
+            {
+                con.Open();
+                try
+                {
+                    Validate(person);
+                    MySqlCommand delete = new MySqlCommand($"DELETE FROM Accounts WHERE username = '{person.username}'", con);
+                    delete.ExecuteNonQuery();
+                }
+                catch (Exception e)
+                {
+                    throw e;
+                }
+                finally
+                {
+                    con.Close();
+                }
+            }
+        }
+
         // POST <UserController>/validate
         [HttpPost("/validate")]
-        public void Validate([FromBody] User person)
+        public Boolean Validate([FromBody] User person)
         {
             User cleaned = DBCon.Clean(person);
             User ret = null;
@@ -119,21 +146,28 @@ namespace schedulesUnitedHosted.Server.Controllers
                 string name = person.name;
                 string username = person.username;
                 string password = person.password;
-                //TODO: write the SQL query that will insert the user into the DB
-                MySqlCommand check = new MySqlCommand($"SELECT * FROM Accounts WHERE username = '{username}'");
+                MySqlCommand check = new MySqlCommand($"SELECT * FROM Accounts WHERE username = '{username}'", con);
                 using (var reader = check.ExecuteReader())
                     while (reader.Read())
                     {
-                        ret = new User(Int32.Parse(reader["accountID"].ToString()), reader["name"].ToString(), reader["username"].ToString(), reader["password"].ToString());
+                        ret = new User(Int32.Parse(reader["accountID"].ToString()), reader["personName"].ToString(), reader["username"].ToString(), reader["accountPassword"].ToString());
                     }
-                if (ret.username.Equals(username) && ret.password.Equals(password))
+                if (ret == null)
+                {
+                    // Credentials incorrect, throw an error
+                    throw new Exception("Username and/or Password incorrect");
+                    return false;
+                }
+                else if(ret.username.Equals(username) && ret.password.Equals(password))
                 {
                     // No error means a correct validation
+                    return true;
                 }
                 else
                 {
                     // Credentials incorrect, throw an error
                     throw new Exception("Username and/or Password incorrect");
+                    return false;
                 }
                 con.Close();
             }
