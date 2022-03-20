@@ -10,5 +10,11 @@ namespace schedulesUnitedHosted.Shared
     {
         public User user { get; set; }
         public Survey survey { get; set; }
+
+        public UserSurvey(Survey s, User u)
+        {
+            user = u;
+            survey = s;
+        }
     }
 }

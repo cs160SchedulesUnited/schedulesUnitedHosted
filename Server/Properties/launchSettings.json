@@ -13,7 +13,7 @@
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "DB_CONNECTION_STRING": "server=cs160-db.cocfzrdakcvx.us-west-1.rds.amazonaws.com;port=3306;database=newschema;user=admin;password=CS160DBCon"
+        "DB_CONNECTION_STRING": "server=cs160-db.cocfzrdakcvx.us-west-1.rds.amazonaws.com;port=3306;database=newschema;user=admin;password=CS160DBCon;Convert Zero Datetime=True"
       },
       "inspectUri": "{wsProtocol}://{url.hostname}:{url.port}/_framework/debug/ws-proxy?browser={browserInspectUri}"
     },
@@ -22,7 +22,7 @@
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "DB_CONNECTION_STRING": "server=cs160-db.cocfzrdakcvx.us-west-1.rds.amazonaws.com;port=3306;database=newschema;user=admin;password=CS160DBCon"
+        "DB_CONNECTION_STRING": "server=cs160-db.cocfzrdakcvx.us-west-1.rds.amazonaws.com;port=3306;database=newschema;user=admin;password=CS160DBCon;Convert Zero Datetime=True"
       },
       "inspectUri": "{wsProtocol}://{url.hostname}:{url.port}/_framework/debug/ws-proxy?browser={browserInspectUri}",
       "applicationUrl": "https://localhost:5001;http://localhost:5000"
