@@ -22,5 +22,10 @@ namespace schedulesUnitedHosted.Shared
             this.Hour = Hour;
         }
 
+        public string ToString()
+        {
+            return $"event: {EventId}, account: {AccId}, availability: {Availability}, hour: {Hour}";
+        }
+
     }
 }
