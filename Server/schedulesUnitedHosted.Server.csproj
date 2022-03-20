@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="3.2.1" />
+    <PackageReference Include="Radzen.Blazor" Version="3.16.6" />
   </ItemGroup>
 
   <ItemGroup>
@@ -14,4 +15,7 @@
   </ItemGroup>
 
 
+  <ItemGroup>
+    <None Remove="Radzen.Blazor" />
+  </ItemGroup>
 </Project>
