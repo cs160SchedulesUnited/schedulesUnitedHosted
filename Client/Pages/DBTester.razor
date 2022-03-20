@@ -1,0 +1,27 @@
+﻿@page "/dbtester"
+@using schedulesUnitedHosted.Shared
+@inject HttpClient Http
+
+<h1>DB Connection Test</h1>
+
+<p>This component tests connecting, getting, and sending data to the DB.</p>
+
+@if (resp == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <p><em>@resp</em></p>
+}
+
+@code {
+    private string resp;
+
+    protected override async Task OnInitializedAsync()
+    {
+        resp = await Http.GetFromJsonAsync<String>("DB");
+    }
+
+}
+

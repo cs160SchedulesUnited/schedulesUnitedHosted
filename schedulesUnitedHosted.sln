@@ -1,13 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.810.19
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32210.238
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "schedulesUnitedHosted.Server", "Server\schedulesUnitedHosted.Server.csproj", "{7ED997B9-6D40-4B03-A234-3C1383DED402}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "schedulesUnitedHosted.Server", "Server\schedulesUnitedHosted.Server.csproj", "{7ED997B9-6D40-4B03-A234-3C1383DED402}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "schedulesUnitedHosted.Client", "Client\schedulesUnitedHosted.Client.csproj", "{6B76943A-E7EC-4828-A063-FE94828779A9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "schedulesUnitedHosted.Client", "Client\schedulesUnitedHosted.Client.csproj", "{6B76943A-E7EC-4828-A063-FE94828779A9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "schedulesUnitedHosted.Shared", "Shared\schedulesUnitedHosted.Shared.csproj", "{3C91BAAA-B9ED-46F7-8C10-77B8C495028B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "schedulesUnitedHosted.Shared", "Shared\schedulesUnitedHosted.Shared.csproj", "{3C91BAAA-B9ED-46F7-8C10-77B8C495028B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "schedulesUnitedHosted.Tests", "schedulesUnitedHosted.Tests\schedulesUnitedHosted.Tests.csproj", "{F32E89BC-CC12-41FD-BAAA-215C172ADB9B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{3C91BAAA-B9ED-46F7-8C10-77B8C495028B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3C91BAAA-B9ED-46F7-8C10-77B8C495028B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3C91BAAA-B9ED-46F7-8C10-77B8C495028B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F32E89BC-CC12-41FD-BAAA-215C172ADB9B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F32E89BC-CC12-41FD-BAAA-215C172ADB9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F32E89BC-CC12-41FD-BAAA-215C172ADB9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F32E89BC-CC12-41FD-BAAA-215C172ADB9B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
