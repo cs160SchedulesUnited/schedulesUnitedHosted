@@ -22,6 +22,21 @@ namespace schedulesUnitedHosted.Tests
         }
 
         [Fact]
+        public void getDayResponsesExists()
+        {
+            var controller = new SurveyController();
+            var testResponses = getTestResponses();
+            controller.createResponse(testResponses[0]);
+            controller.createResponse(testResponses[1]);
+            DateTime day = new DateTime(1999, 1, 1);
+            var s = day.ToString("yyyy-MM-dd");
+            var test = controller.getDayResponses(2, s);
+            controller.deleteResponse(testResponses[1]);
+            controller.deleteResponse(testResponses[0]);
+            Assert.Equal(testResponses[1].ToString(), test[0].ToString());
+        }
+
+        [Fact]
         public void getAllResponsesNonexistent()
         {
             var controller = new SurveyController();

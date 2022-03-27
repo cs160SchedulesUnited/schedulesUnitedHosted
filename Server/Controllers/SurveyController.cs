@@ -13,12 +13,8 @@ namespace schedulesUnitedHosted.Server.Controllers
     [ApiController]
     public class SurveyController : ControllerBase
     {
-        //TODO: getAllSurvey(string person), getOneSurvey(string id), getUsersResps(string user, string id)
-        //TODO: create helper method getAllResps(string id)
-
-        //TODO: createOne(), editOne(string id, User person), deleteOne(string id, User person)
-
-        // Helper method, to get all responses to the given survey
+        // GET <SurveyController>/responses/{eventID}
+        [HttpGet("/responses/{eventID:int}")]
         public List<Response> getAllResponses(int eventID)
         {
             List<Response> ret = new List<Response>();
@@ -31,6 +27,37 @@ namespace schedulesUnitedHosted.Server.Controllers
             {
                 con.Open();
                 MySqlCommand getResponses = new MySqlCommand($"SELECT * FROM Availabilities WHERE eventID = {eventID}", con);
+                int i = 0;
+                using (var reader = getResponses.ExecuteReader())
+                    while (reader.Read())
+                    {
+                        int accountID = Int32.Parse(reader["accountID"].ToString());
+                        DateTime availableDay = DateTime.Parse(reader["availableDay"].ToString());
+                        int availableHour = Int32.Parse(reader["availableHour"].ToString());
+
+                        ret.Add(new Response(accountID, eventID, availableDay, availableHour));
+                        i++;
+                    }
+                con.Close();
+            }
+            return ret;
+        }
+
+        // GET <SurveyController>/responses/{eventID}/{date}
+        [HttpGet("/responses/{eventID:int}/{date}")]
+        public List<Response> getDayResponses(int eventID, string date)
+        {
+            string day = DBCon.Clean(date);
+            List<Response> ret = new List<Response>();
+            string conString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
+
+            DBCon conGen = new DBCon(conString);
+            MySqlConnection con = conGen.GetConnection();
+
+            using (con)
+            {
+                con.Open();
+                MySqlCommand getResponses = new MySqlCommand($"SELECT * FROM Availabilities WHERE eventID = {eventID} AND availableDay = '{day}'", con);
                 int i = 0;
                 using (var reader = getResponses.ExecuteReader())
                     while (reader.Read())
@@ -216,6 +243,16 @@ namespace schedulesUnitedHosted.Server.Controllers
                 MySqlCommand createSurvey = new MySqlCommand($"INSERT INTO CalendarEvents VALUES (NULL, '{create.name}', '{create.start.ToString("yyyy-MM-dd")}', '{create.end.ToString("yyyy-MM-dd")}', {create.host})", con);
                 createSurvey.ExecuteNonQuery();
                 con.Close();
+            }
+            if (create.Responses.Count > 0)
+            {
+                int id = getSurveyID(create.name, create.host);
+                for(int i = 0; i < create.Responses.Count; i++)
+                {
+                    Response temp = create.Responses[i];
+                    temp.EventId = id;
+                    createResponse(create.Responses[i]);
+                }
             }
         }
 
