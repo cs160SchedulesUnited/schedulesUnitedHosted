@@ -1,42 +1,73 @@
 ﻿@page "/createSurvey"
-
+@using Radzen.Blazor
+@using schedulesUnitedHosted.Shared
 
 <h1>Create Survey for participants</h1>
 
-<form>
-    <div>
-        <label>Name Of Event</label>
-        <input type="text" />
-    </div>
-    <div>
-        <label>Start Date</label>
-        <input type="date"/>
-    </div>
-    <div>
-        <label>End Date</label>
-        <input type="date"/>
-    </div>
-    <div>
-        <label>Date Requested Type</label>
-        <div>
-            <input type="radio" checked>
-            <label>Date</label>
+<RadzenCard>
+
+        <div class="row">
+            <div class="col-md-4 align-items-center d-flex">
+                <RadzenLabel Text="Name" />
+            </div>
+            <div class="col-md-8">
+                <RadzenTextBox @bind-Value="survey.name" />
+            </div>
+        </div>
+        @*<div class="row">
+            <div class="col-md-4 align-items-center d-flex">
+                <RadzenLabel Text="Email" />
+            </div>
+            <div class="col-md-8">
+                <RadzenTextBox @bind-Value="survey.email" Class="w-100" />
+            </div>
+        </div>*@
+        <div class="row">
+            <div class="col-md-4 align-items-center d-flex">
+                <RadzenLabel Text="Start Date" />
+            </div>
+            <div class="col-md-8">
+                <RadzenDatePicker @bind-Value='survey.start' Inline="true" DateFormat="d" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4 align-items-center d-flex">
+                <RadzenLabel Text="End Date" />
+            </div>
+            <div class="col-md-8">
+                <RadzenDatePicker @bind-Value='survey.end' Inline="true" DateFormat="d" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4 align-items-center d-flex">
+                <RadzenLabel Text="Response Type" />
+            </div>
+            <div class="col-md-8">
+                <RadzenRadioButtonList @bind-Value='survey.dateType' TValue="int" Orientation="Orientation.Vertical">
+                    <Items>
+                        <RadzenRadioButtonListItem Text="Date" Value="1" />
+                        <RadzenRadioButtonListItem Text="Time" Value="2" />
+                    </Items>
+                </RadzenRadioButtonList>
+            </div>
         </div>
 
-        <div>
-            <input type="radio" >
-            <label>Time</label>
+        <div class="row justify-content-center">
+            <div class="col-md-12 d-flex align-items-end justify-content-center" style="margin-top: 16px;">
+                <RadzenButton ButtonType="ButtonType.Submit" Icon="save" Text="Submit" Click="@Submit" />
+                
+            </div>
         </div>
-
-    </div>
-    <div>
-        <label>Input Emails</label>
-        <input type="email" multiple />
-    </div>
-    <button>Create</button>
-</form>
+    </RadzenCard>
 
 
-@code {
+    @code {
 
-}
+
+        Survey survey = new Survey();
+        void Submit()
+        {
+            Console.WriteLine("test");
+        }
+
+    }
