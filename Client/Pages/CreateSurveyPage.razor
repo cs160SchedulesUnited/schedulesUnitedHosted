@@ -35,7 +35,7 @@
                 <RadzenLabel Text="End Date" />
             </div>
             <div class="col-md-8">
-                <RadzenDatePicker @bind-Value='survey.end' Inline="true" DateFormat="d" />
+                <RadzenDatePicker  @bind-Value='survey.end' Inline="true" DateFormat="d" />
             </div>
         </div>
         <div class="row">
@@ -67,7 +67,7 @@
         Survey survey = new Survey();
         void Submit()
         {
-            Console.WriteLine("test");
+            Console.WriteLine(survey.ToString());
         }
 
     }
