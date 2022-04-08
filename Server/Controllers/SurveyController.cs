@@ -14,6 +14,10 @@ namespace schedulesUnitedHosted.Server.Controllers
     public class SurveyController : ControllerBase
     {
         // GET <SurveyController>/responses/{eventID}
+        /**
+         * <param name="eventID">The ID of the event for which responses should be fetched, provide this in the URL</param>
+         * <returns>A List of all responses to the survey</returns>
+         */
         [HttpGet("/responses/{eventID:int}")]
         public List<Response> getAllResponses(int eventID)
         {
@@ -44,6 +48,11 @@ namespace schedulesUnitedHosted.Server.Controllers
         }
 
         // GET <SurveyController>/responses/{eventID}/{date}
+        /**
+         * <param name="eventID">The Id of the event for which responses are being requested, provide this in the URL</param>
+         * <param name="date">The date as a string for which responses are being requested, provide this in the URL in the form: yyyy-MM-dd</param>
+         * <returns>All responses to the survey on the given date</returns>
+         */
         [HttpGet("/responses/{eventID:int}/{date}")]
         public List<Response> getDayResponses(int eventID, string date)
         {
@@ -75,6 +84,10 @@ namespace schedulesUnitedHosted.Server.Controllers
         }
 
         // GET <SurveyController>/surveys/{username}
+        /**
+         * <param name="userID">The ID of the User whos Surveys are being requested</param>
+         * <returns>All surveys owned by the User</returns>
+         */
         [HttpGet("/surveys/{userID:int}")]
         public List<Survey> getAllSurvey(int userID)
         {
@@ -108,6 +121,10 @@ namespace schedulesUnitedHosted.Server.Controllers
         }
 
         // GET <SurveyController>/survey/{surveyID}
+        /**
+         * <param name="surveyID">The id of the survey being requested</param>
+         * <returns>The survey object with the provided ID</returns>
+         */
         [HttpGet("survey/{surveyID:int}")]
         public Survey getOneSurvey(int surveyID)
         {
@@ -140,6 +157,11 @@ namespace schedulesUnitedHosted.Server.Controllers
         }
 
         // GET <SurveyController>/survey/{surveyName}/{ownerID}
+        /**
+         * <param name="ownerID">Id of the owner of the Survey</param>
+         * <param name="surveyName">Name of the Survey being requested</param>
+         * <returns>The ID of the requested Survey</returns>
+         */
         [HttpGet("survey/{surveyName}/{ownerID:int}")]
         public int getSurveyID(string surveyName, int ownerID)
         {
@@ -165,6 +187,11 @@ namespace schedulesUnitedHosted.Server.Controllers
         }
 
         // GET <SurveyController>/{surveyID}/{username}
+        /**
+         * <param name="surveyID">The ID of the survey whos responses are being requested</param>
+         * <param name="accountID">The account id of the User whos responses are being requested</param>
+         * <returns>All responses from the User on the Survey requested</returns>
+         */
         [HttpGet("{surveyID:int}/{accountID:int}")]
         public List<Response> getUsersResponses(int surveyID, int accountID)
         {
@@ -194,6 +221,9 @@ namespace schedulesUnitedHosted.Server.Controllers
         }
 
         // POST <SurveyController>
+        /**
+         * <param name="create">The Response to be created, provided in the body of the POST, need all fields, if Hour is not wanted use 0 as a placeholder</param>
+         */
         [HttpPost("respond")]
         public void createResponse([FromBody] Response create)
         {
@@ -212,6 +242,10 @@ namespace schedulesUnitedHosted.Server.Controllers
         }
 
         // POST <SurveyController>
+        /**
+         * this should only be available to the owner of the survey or the User who submitted the response
+         * <param name="delete">The response to be deleted, provided in the body of the POST</param>
+         */
         [HttpPost("delete")]
         public void deleteResponse([FromBody] Response delete)
         {
@@ -230,6 +264,9 @@ namespace schedulesUnitedHosted.Server.Controllers
         }
 
         // POST <SurveyController>
+        /**
+         * <param name="create">The survey that is to be created, provided in the body of the POST. The Survey ID field is not required, and should be requested once the survey is created. Additionally, if responses are present they will be added to the survey</param>
+         */
         [HttpPost("create")]
         public void CreateSurvey([FromBody] Survey create)
         {
@@ -257,6 +294,9 @@ namespace schedulesUnitedHosted.Server.Controllers
         }
 
         // POST <SurveyController>
+        /**
+         * <param name="combined">The UserSurvey object that holds both the Survey and its Owning User, provided in the body of the POST. Only works if the provided user is the owner of the Survey</param>
+         */
         [HttpPost("edit")]
         public void EditSurvey([FromBody] UserSurvey combined)
         {
@@ -271,7 +311,7 @@ namespace schedulesUnitedHosted.Server.Controllers
                 using (con)
                 {
                     con.Open();
-                    //Delete survey
+                    //Edit survey
                     MySqlCommand editSurvey = new MySqlCommand($"UPDATE CalendarEvents SET eventName = '{DBCon.Clean(edit.name)}', startDate = '{edit.start.ToString("yyyy-MM-dd")}', endDate = '{edit.end.ToString("yyyy-MM-dd")}' WHERE eventID = {edit.id}", con);
                     editSurvey.ExecuteNonQuery();
                     con.Close();
@@ -280,6 +320,10 @@ namespace schedulesUnitedHosted.Server.Controllers
         }
 
         // POST <SurveyController>
+        /**
+         * <param name="combined">The UserSurvey object that holds both the Survey and its Owning User, provided in the body of the POST. Only works if the provided user is the owner of the Survey</param>
+         * <exception cref="Exception">Throws an exception if the User is not the owner of the Survey, or if the survey doesn't exist</exception>
+         */
         [HttpPost("delete/{id:int}")]
         public void DeleteSurvey(int id, [FromBody] User owner)
         {
