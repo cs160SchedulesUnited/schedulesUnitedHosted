@@ -1,37 +1,42 @@
 ﻿@page "/organizerDashboard"
-@using Radzen.Blazor
+@using Radzen.Blazor;
+@using schedulesUnitedHosted.Shared;
+@inject DialogService DialogService;
+@implements IDisposable;
+@inject NavigationManager NavigationManager;
+
 <h3>Organizer Dashboard</h3>
 
-@*<RadzenCard>
-    <RadzenDataList>
+<RadzenCard>
+    <RadzenDataList WrapItems="true" AllowPaging="true" Data="@surveys" TItem="Survey" PageSize="5" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true">
         <Template Context="survey">
             <RadzenCard Style="width: 100%; padding: 0; overflow: hidden;">
                 <div class="container">
                     <div class="row">
                         <div class="col-lg-3 p-3 product-title">
-                            @(survey.ProductName)
+                            @(survey.name)
                         </div>
                         <div class="col-lg-7 p-3">
                             <div class="row d-flex">
                                 <div class="col-md-6 col-lg-2">
-                                    <h5 class="mb-0">In Stock</h5>
-                                    <p class="mb-sm-2 mb-lg-0">@(survey.UnitsInStock)</p>
+                                    <h5 class="mb-0">Host</h5>
+                                    <p class="mb-sm-2 mb-lg-0">@(survey.host)</p>
                                 </div>
                                 <div class="col-md-6 col-lg-2">
-                                    <h5 class="mb-0">Origin</h5>
-                                    <p class="mb-sm-2 mb-lg-0">@(survey.Supplier?.Country)</p>
+                                    <h5 class="mb-0">DateType</h5>
+                                    <p class="mb-sm-2 mb-lg-0">@(survey.dateType)</p>
                                 </div>
                                 <div class="col-md-6 col-lg-5">
-                                    <h5 class="mb-0">Sold by</h5>
-                                    <p class="mb-sm-2 mb-lg-0">@(survey.Supplier?.CompanyName)</p>
+                                    <h5 class="mb-0">Start</h5>
+                                    <p class="mb-sm-2 mb-lg-0">@(survey.start)</p>
                                 </div>
                                 <div class="col-md-6 order-first order-lg-last col-lg-3 text-sm-left text-lg-right mb-3 mb-lg-0">
-                                    <RadzenBadge BadgeStyle="BadgeStyle.Secondary" Class="price-badge" Text=@($"{String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", survey.UnitPrice)}") />
+                                    <RadzenBadge BadgeStyle="BadgeStyle.Secondary" Class="price-badge" Text=@(survey.Responses.Count.ToString()) />
                                 </div>
                             </div>
                         </div>
                         <div class="col-lg-2 p-3">
-                            <RadzenButton Text="Order now" Class="w-100" />
+                            <RadzenButton Text="Manage" Click="@(args => OnClick(survey))" Class="w-100" />
                         </div>
                     </div>
                 </div>
@@ -58,10 +63,65 @@
         line-height: 20px;
         padding: 8px;
     }
-</style>*@
+</style>
 
 @code {
 
 
+    IList<Survey> surveys = new List<Survey> {
+
+        new Survey(45, "survey 1", DateTime.Today, DateTime.Today.AddDays(1), 410, new List<Response>()),
+        new Survey(46, "survey 2", DateTime.Today, DateTime.Today.AddDays(1), 420, new List<Response>()),
+        new Survey(47, "survey 3", DateTime.Today, DateTime.Today.AddDays(1), 430, new List<Response>()),
+        new Survey(48, "survey 4", DateTime.Today, DateTime.Today.AddDays(1), 440, new List<Response>()),
+        new Survey(49, "survey 5", DateTime.Today, DateTime.Today.AddDays(1), 450, new List<Response>()),
+        new Survey(50, "survey 6", DateTime.Today, DateTime.Today.AddDays(1), 460, new List<Response>())
+    };
+
+    public async Task OnClick(Survey survey)
+    {
+        Console.WriteLine(survey.ToString());
+        //take id to next page
+        //NavigationManager.NavigateTo($"/responsePage/{surveyId}");
+        await DialogService.OpenAsync<ResponsePage>($"Name sd",
+               new Dictionary<string, object>() { { "surveyId", 1 } },
+               new DialogOptions () { Width = "100%", Height = "100%", Resizable = true, Draggable = true });
+    }
+
+    protected override void OnInitialized()
+    {
+        //function to get surveys
+        DialogService.OnOpen += Open;
+        DialogService.OnClose += Close;
+    }
+
+
+    public void Dispose()
+    {
+        // The DialogService is a singleton so it is advisable to unsubscribe.
+        DialogService.OnOpen -= Open;
+        DialogService.OnClose -= Close;
+    }
+
+    void Open(string title, Type type, Dictionary<string, object> parameters, DialogOptions options)
+    {
+        Console.WriteLine("Dialog opened");
+    }
+
+    void Close(dynamic result)
+    {
+        Console.WriteLine($"Dialog closed");
+    }
+
+    async Task ShowInlineDialog() => await DialogService.OpenAsync("Simple Dialog", DialogService =>
+    @<div>
+        <p Style="margin-bottom: 1rem">Confirm?</p>
+        <div class="row">
+            <div class="col-md-12">
+                <RadzenButton Text="Ok" Click="() => DialogService.Close(true)" Style="margin-bottom: 10px; width: 150px" />
+                <RadzenButton Text="Cancel" Click="() => DialogService.Close(false)" ButtonStyle="ButtonStyle.Secondary" Style="margin-bottom: 10px; width: 150px" />
+            </div>
+        </div>
+    </div>);
 
 }

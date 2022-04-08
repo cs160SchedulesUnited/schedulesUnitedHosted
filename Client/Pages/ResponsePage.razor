@@ -1,14 +1,31 @@
-﻿@page "/responsePage"
+﻿@page "/responsePage/{surveyId}"
 @using Radzen.Blazor
 @using System.Linq;
 
-<h3>Response Page</h3>
+@inject Radzen.DialogService dialogService;
 
-<RadzenScheduler Data="@appointments" @ref=@scheduler Style="height: 700px" TItem="Appointment" StartProperty="Start" SlotSelect=@OnSlotSelect AppointmentSelect=@OnAppointmentSelect EndProperty="End" TextProperty="Text">
-    <RadzenMonthView />
-</RadzenScheduler>
+
+
+
+<RadzenCard Style="margin: 0px; height: 90vh;">
+
+            <RadzenScheduler Data="@appointments" @ref=@scheduler Style="height: 90%; width: 100%; margin: 0px;" TItem="Appointment" StartProperty="Start" SlotSelect=@OnSlotSelect AppointmentSelect=@OnAppointmentSelect EndProperty="End" TextProperty="Text">
+                <RadzenMonthView />
+            </RadzenScheduler>
+
+    @*<div class="row">
+        <div class="col-md-12 text-right">
+            <RadzenButton Click="@((args) => dialogService.Close(false))" ButtonStyle="ButtonStyle.Secondary" Text="Cancel" Style="width: 120px" Class="mr-1" />
+            <RadzenButton Click="@((args) => dialogService.Close(true))" Text="OK" Style="width: 120px" />
+        </div>
+    </div>*@
+</RadzenCard>
+
+
 @code {
 
+
+    [Parameter] public int surveyId { get; set; }
 
     RadzenScheduler<Appointment> scheduler;
 
@@ -18,8 +35,12 @@
         public DateTime End { get; set; }
         public string Text { get; set; }
     }
+    IList<Appointment> appointments;
 
-    IList<Appointment> appointments = new List<Appointment>
+
+    protected override void OnInitialized()
+    {
+        appointments = new List<Appointment>
 {
         new Appointment { Start = DateTime.Today.AddDays(-2), End = DateTime.Today.AddDays(-2), Text = "Birthday" },
         new Appointment { Start = DateTime.Today.AddDays(-11), End = DateTime.Today.AddDays(-10), Text = "Day off" },
@@ -28,7 +49,8 @@
         new Appointment { Start = DateTime.Today.AddHours(10), End = DateTime.Today.AddHours(13), Text = "Skype call" },
         new Appointment { Start = DateTime.Today.AddHours(14), End = DateTime.Today.AddHours(14).AddMinutes(30), Text = "Dentist appointment" },
         new Appointment { Start = DateTime.Today.AddDays(1), End = DateTime.Today.AddDays(12), Text = "Vacation" },
-    };
+        };
+    }
     @*DataItem[] data = new DataItem[]
         {
           new DataItem
