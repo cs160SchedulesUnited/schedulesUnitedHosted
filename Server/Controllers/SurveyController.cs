@@ -5,7 +5,7 @@ using MySql.Data.MySqlClient;
 using System.Collections.Generic;
 using System.Globalization;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+//TODO: Create APIs for the invite functions. CreateInvite, GetUsersInvites, GetSurveysInvites
 
 namespace schedulesUnitedHosted.Server.Controllers
 {

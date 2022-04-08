@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace schedulesUnitedHosted.Shared
@@ -43,6 +44,44 @@ namespace schedulesUnitedHosted.Shared
                 }
             }
             return num;
+        }
+
+        public String hashPass(String password)
+        {
+            String hashed;
+            Rfc2898DeriveBytes RFCDB = new Rfc2898DeriveBytes(password, 8, 10000);
+            byte[] hashedPW = RFCDB.GetBytes(20);
+            byte[] salt = RFCDB.Salt;
+            hashed = Encoding.GetEncoding("iso-8859-1").GetString(salt) + Encoding.ASCII.GetString(hashedPW);
+            return hashed;
+        }
+
+        public int saltLength(String password)
+        {
+            String hashed;
+            Rfc2898DeriveBytes RFCDB = new Rfc2898DeriveBytes(password, 8, 10000);
+            byte[] hashedPW = RFCDB.GetBytes(20);
+            byte[] salt = RFCDB.Salt;
+            String saltString = Encoding.GetEncoding("iso-8859-1").GetString(salt);
+            return saltString.Length;
+        }
+
+        public String hashPass(String password, byte[] salt)
+        {
+            String hashed;
+            Rfc2898DeriveBytes RFCDB = new Rfc2898DeriveBytes(password, salt, 10000);
+            byte[] hashedPW = RFCDB.GetBytes(20);
+            hashed = Encoding.ASCII.GetString(salt) + Encoding.GetEncoding("iso-8859-1").GetString(hashedPW);
+            return hashed;
+        }
+
+        public Boolean verifyPass(String pass, String hash)
+        {
+            byte[] salt = Encoding.GetEncoding("iso-8859-1").GetBytes(hash.Substring(0, 8));
+            Rfc2898DeriveBytes RFCDB = new Rfc2898DeriveBytes(pass, salt, 10000);
+            String comp = Encoding.GetEncoding("iso-8859-1").GetString(salt) + Encoding.ASCII.GetString(RFCDB.GetBytes(20));
+            if (comp == hash) return true;
+            else return false;
         }
     }
 
