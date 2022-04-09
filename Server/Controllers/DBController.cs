@@ -17,6 +17,7 @@ namespace schedulesUnitedHosted.Server.Controllers
 
         // GET: <DBController>
         [HttpGet]
+        [Produces("application/json")]
         public String Get()
         {
             //TODO: Make this an env variable if possible, our connection string should not be publicly visible
@@ -42,6 +43,13 @@ namespace schedulesUnitedHosted.Server.Controllers
                 con.Close();
             }
             return "Connection Successful";
+        }
+
+        [HttpGet("{username}")]
+        [Produces("application/json")]
+        public string getUserInfo(string username)
+        {
+            return username;
         }
     }
 }
