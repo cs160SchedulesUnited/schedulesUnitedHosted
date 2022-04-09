@@ -19,6 +19,7 @@ namespace schedulesUnitedHosted.Server.Controllers
          * <returns>A List of all responses to the survey</returns>
          */
         [HttpGet("/responses/{eventID:int}")]
+        [Produces("application/json")]
         public List<Response> getAllResponses(int eventID)
         {
             List<Response> ret = new List<Response>();
@@ -54,6 +55,7 @@ namespace schedulesUnitedHosted.Server.Controllers
          * <returns>All responses to the survey on the given date</returns>
          */
         [HttpGet("/responses/{eventID:int}/{date}")]
+        [Produces("application/json")]
         public List<Response> getDayResponses(int eventID, string date)
         {
             string day = DBCon.Clean(date);
@@ -89,6 +91,7 @@ namespace schedulesUnitedHosted.Server.Controllers
          * <returns>All surveys owned by the User</returns>
          */
         [HttpGet("/surveys/{userID:int}")]
+        [Produces("application/json")]
         public List<Survey> getAllSurvey(int userID)
         {
             List<Survey> ret = new List<Survey>();
@@ -126,6 +129,7 @@ namespace schedulesUnitedHosted.Server.Controllers
          * <returns>The survey object with the provided ID</returns>
          */
         [HttpGet("survey/{surveyID:int}")]
+        [Produces("application/json")]
         public Survey getOneSurvey(int surveyID)
         {
             int cleaned = surveyID;
@@ -163,6 +167,7 @@ namespace schedulesUnitedHosted.Server.Controllers
          * <returns>The ID of the requested Survey</returns>
          */
         [HttpGet("survey/{surveyName}/{ownerID:int}")]
+        [Produces("application/json")]
         public int getSurveyID(string surveyName, int ownerID)
         {
             string cleaned = DBCon.Clean(surveyName);
@@ -193,6 +198,7 @@ namespace schedulesUnitedHosted.Server.Controllers
          * <returns>All responses from the User on the Survey requested</returns>
          */
         [HttpGet("{surveyID:int}/{accountID:int}")]
+        [Produces("application/json")]
         public List<Response> getUsersResponses(int surveyID, int accountID)
         {
             List<Response> ret = new List<Response>();

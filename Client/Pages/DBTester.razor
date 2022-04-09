@@ -1,5 +1,7 @@
 ﻿@page "/dbtester"
 @using schedulesUnitedHosted.Shared
+@using System.Net.Http
+@using System.Net.Http.Json
 @inject HttpClient Http
 
 <h1>DB Connection Test</h1>
@@ -20,7 +22,13 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        resp = await Http.GetFromJsonAsync<String>("DB");
+        try
+        {
+            resp = await Http.GetFromJsonAsync<String>("DB");
+        }catch(Exception e)
+        {
+            resp = e.Message + "\n" + e.StackTrace;
+        }
     }
 
 }

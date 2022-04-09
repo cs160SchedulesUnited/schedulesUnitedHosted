@@ -21,6 +21,7 @@ namespace schedulesUnitedHosted.Server.Controllers
          * <returns>A User with accountID, personName, userName, and password</returns>
          */
         [HttpGet("{username}")]
+        [Produces("application/json")]
         public User getUserInfo(string username)
         {
             string cleaned = DBCon.Clean(username);
@@ -50,6 +51,7 @@ namespace schedulesUnitedHosted.Server.Controllers
          * <returns>User id, or 0 if user is not found</returns>
          */
         [HttpGet("id/{username}")]
+        [Produces("application/json")]
         public int getUserID(string username)
         {
             string cleaned = DBCon.Clean(username);
