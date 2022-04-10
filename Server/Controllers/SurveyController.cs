@@ -284,6 +284,70 @@ namespace schedulesUnitedHosted.Server.Controllers
             return ret;
         }
 
+        // GET <SurveyController>/invited/nonresponded/{userID}
+        /**
+         * <param name="userID">The ID of the user whos invites are being requested</param>
+         * <returns>Ids of all surveys who the user has been invited to respond to, but has not yet responded to</returns>
+         */
+        [HttpGet("invited/nonresponded/{userID:int}")]
+        [Produces("application/json")]
+        public List<int> getInvitedSurveysUnanswered(int userID)
+        {
+            List<int> ret = new List<int>();
+            string conString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
+
+            DBCon conGen = new DBCon(conString);
+            MySqlConnection con = conGen.GetConnection();
+
+            using (con)
+            {
+                con.Open();
+                MySqlCommand getResponses = new MySqlCommand($"SELECT eventID FROM Invites WHERE accountID = {userID} AND answered = 0", con);
+                int i = 0;
+                using (var reader = getResponses.ExecuteReader())
+                    while (reader.Read())
+                    {
+                        int eventID = Int32.Parse(reader["eventID"].ToString());
+                        ret.Add(eventID);
+                        i++;
+                    }
+                con.Close();
+            }
+            return ret;
+        }
+
+        // GET <SurveyController>/invited/nonresponded/{userID}
+        /**
+         * <param name="userID">The ID of the user whos invites are being requested</param>
+         * <returns>Ids of all surveys who the user has been invited and responded to</returns>
+         */
+        [HttpGet("invited/responded/{userID:int}")]
+        [Produces("application/json")]
+        public List<int> getInvitedSurveysAnswered(int userID)
+        {
+            List<int> ret = new List<int>();
+            string conString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
+
+            DBCon conGen = new DBCon(conString);
+            MySqlConnection con = conGen.GetConnection();
+
+            using (con)
+            {
+                con.Open();
+                MySqlCommand getResponses = new MySqlCommand($"SELECT eventID FROM Invites WHERE accountID = {userID} AND answered = 1", con);
+                int i = 0;
+                using (var reader = getResponses.ExecuteReader())
+                    while (reader.Read())
+                    {
+                        int eventID = Int32.Parse(reader["eventID"].ToString());
+                        ret.Add(eventID);
+                        i++;
+                    }
+                con.Close();
+            }
+            return ret;
+        }
+
         // POST <SurveyController>/respond
         /**
          * <param name="create">The Response to be created, provided in the body of the POST, need all fields, if Hour is not wanted use 0 as a placeholder</param>
