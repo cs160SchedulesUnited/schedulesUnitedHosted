@@ -329,9 +329,9 @@ namespace schedulesUnitedHosted.Server.Controllers
         {
             User cleaned = DBCon.Clean(owner);
             var survey = getOneSurvey(id);
-            if(survey != null)
+            if (survey != null)
             {
-                if(survey.host == cleaned.accountID)
+                if (survey.host == cleaned.accountID)
                 {
                     string conString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
                     DBCon conGen = new DBCon(conString);
@@ -356,6 +356,26 @@ namespace schedulesUnitedHosted.Server.Controllers
             {
                 throw new Exception("Survey doesn't exist");
             }
+        }
+
+        // POST <SurveyController>/invite/{id}
+        /**
+         * <param name="survey">The The ID of the survey the user is being invited to, to be included in the body of the POST</param>
+         * <param name="id">The id of the user being invited, to be included in the URL</param>
+         */
+        [HttpPost("invite/{id:int}")]
+        public void inviteUser(int id, [FromBody] int survey)
+        {
+            string conString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
+            DBCon conGen = new DBCon(conString);
+            MySqlConnection con = conGen.GetConnection();
+            using (con)
+            {
+                con.Open();
+                MySqlCommand createInvite = new MySqlCommand($"INSERT INTO Invites VALUES (NULL, NULL, {survey}, {id})", con);
+                createInvite.ExecuteNonQuery();
+                con.Close();
+            } 
         }
     }
 }
