@@ -5,7 +5,7 @@ using MySql.Data.MySqlClient;
 using System.Collections.Generic;
 using System.Globalization;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+//TODO: Create APIs for the invite functions. CreateInvite, GetUsersInvites, GetSurveysInvites
 
 namespace schedulesUnitedHosted.Server.Controllers
 {
@@ -14,7 +14,12 @@ namespace schedulesUnitedHosted.Server.Controllers
     public class SurveyController : ControllerBase
     {
         // GET <SurveyController>/responses/{eventID}
+        /**
+         * <param name="eventID">The ID of the event for which responses should be fetched, provide this in the URL</param>
+         * <returns>A List of all responses to the survey</returns>
+         */
         [HttpGet("/responses/{eventID:int}")]
+        [Produces("application/json")]
         public List<Response> getAllResponses(int eventID)
         {
             List<Response> ret = new List<Response>();
@@ -44,7 +49,13 @@ namespace schedulesUnitedHosted.Server.Controllers
         }
 
         // GET <SurveyController>/responses/{eventID}/{date}
+        /**
+         * <param name="eventID">The Id of the event for which responses are being requested, provide this in the URL</param>
+         * <param name="date">The date as a string for which responses are being requested, provide this in the URL in the form: yyyy-MM-dd</param>
+         * <returns>All responses to the survey on the given date</returns>
+         */
         [HttpGet("/responses/{eventID:int}/{date}")]
+        [Produces("application/json")]
         public List<Response> getDayResponses(int eventID, string date)
         {
             string day = DBCon.Clean(date);
@@ -75,7 +86,12 @@ namespace schedulesUnitedHosted.Server.Controllers
         }
 
         // GET <SurveyController>/surveys/{username}
+        /**
+         * <param name="userID">The ID of the User whos Surveys are being requested</param>
+         * <returns>All surveys owned by the User</returns>
+         */
         [HttpGet("/surveys/{userID:int}")]
+        [Produces("application/json")]
         public List<Survey> getAllSurvey(int userID)
         {
             List<Survey> ret = new List<Survey>();
@@ -108,7 +124,12 @@ namespace schedulesUnitedHosted.Server.Controllers
         }
 
         // GET <SurveyController>/survey/{surveyID}
+        /**
+         * <param name="surveyID">The id of the survey being requested</param>
+         * <returns>The survey object with the provided ID</returns>
+         */
         [HttpGet("survey/{surveyID:int}")]
+        [Produces("application/json")]
         public Survey getOneSurvey(int surveyID)
         {
             int cleaned = surveyID;
@@ -140,7 +161,13 @@ namespace schedulesUnitedHosted.Server.Controllers
         }
 
         // GET <SurveyController>/survey/{surveyName}/{ownerID}
+        /**
+         * <param name="ownerID">Id of the owner of the Survey</param>
+         * <param name="surveyName">Name of the Survey being requested</param>
+         * <returns>The ID of the requested Survey</returns>
+         */
         [HttpGet("survey/{surveyName}/{ownerID:int}")]
+        [Produces("application/json")]
         public int getSurveyID(string surveyName, int ownerID)
         {
             string cleaned = DBCon.Clean(surveyName);
@@ -165,7 +192,13 @@ namespace schedulesUnitedHosted.Server.Controllers
         }
 
         // GET <SurveyController>/{surveyID}/{username}
+        /**
+         * <param name="surveyID">The ID of the survey whos responses are being requested</param>
+         * <param name="accountID">The account id of the User whos responses are being requested</param>
+         * <returns>All responses from the User on the Survey requested</returns>
+         */
         [HttpGet("{surveyID:int}/{accountID:int}")]
+        [Produces("application/json")]
         public List<Response> getUsersResponses(int surveyID, int accountID)
         {
             List<Response> ret = new List<Response>();
@@ -193,7 +226,138 @@ namespace schedulesUnitedHosted.Server.Controllers
             return ret;
         }
 
-        // POST <SurveyController>
+        // GET <SurveyController>/invite/{eventID}
+        /**
+         * <param name="eventID">The ID of the survey whos invites are being requested</param>
+         * <returns>Ids of all users who have been invited to respond to the survey</returns>
+         */
+        [HttpGet("invite/{eventID:int}")]
+        [Produces("application/json")]
+        public List<int> getInvitedUsers(int eventID)
+        {
+            List<int> ret = new List<int>();
+            string conString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
+
+            DBCon conGen = new DBCon(conString);
+            MySqlConnection con = conGen.GetConnection();
+
+            using (con)
+            {
+                con.Open();
+                MySqlCommand getResponses = new MySqlCommand($"SELECT accountID FROM Invites WHERE eventID = {eventID}", con);
+                int i = 0;
+                using (var reader = getResponses.ExecuteReader())
+                    while (reader.Read())
+                    {
+                        int userID = Int32.Parse(reader["accountID"].ToString());
+                        ret.Add(userID);
+                        i++;
+                    }
+                con.Close();
+            }
+            return ret;
+        }
+
+        // GET <SurveyController>/invite/nonresponded/{eventID}
+        /**
+         * <param name="eventID">The ID of the survey whos invites are being requested</param>
+         * <returns>Ids of all users who have been invited to respond to the survey</returns>
+         */
+        [HttpGet("invite/nonresponded/{eventID:int}")]
+        [Produces("application/json")]
+        public List<int> getNonrespondingUsers(int eventID)
+        {
+            List<int> ret = new List<int>();
+            string conString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
+
+            DBCon conGen = new DBCon(conString);
+            MySqlConnection con = conGen.GetConnection();
+
+            using (con)
+            {
+                con.Open();
+                MySqlCommand getResponses = new MySqlCommand($"SELECT accountID FROM Invites WHERE eventID = {eventID} AND answered = 0", con);
+                int i = 0;
+                using (var reader = getResponses.ExecuteReader())
+                    while (reader.Read())
+                    {
+                        int userID = Int32.Parse(reader["accountID"].ToString());
+                        ret.Add(userID);
+                        i++;
+                    }
+                con.Close();
+            }
+            return ret;
+        }
+
+        // GET <SurveyController>/invited/nonresponded/{userID}
+        /**
+         * <param name="userID">The ID of the user whos invites are being requested</param>
+         * <returns>Ids of all surveys who the user has been invited to respond to, but has not yet responded to</returns>
+         */
+        [HttpGet("invited/nonresponded/{userID:int}")]
+        [Produces("application/json")]
+        public List<int> getInvitedSurveysUnanswered(int userID)
+        {
+            List<int> ret = new List<int>();
+            string conString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
+
+            DBCon conGen = new DBCon(conString);
+            MySqlConnection con = conGen.GetConnection();
+
+            using (con)
+            {
+                con.Open();
+                MySqlCommand getResponses = new MySqlCommand($"SELECT eventID FROM Invites WHERE accountID = {userID} AND answered = 0", con);
+                int i = 0;
+                using (var reader = getResponses.ExecuteReader())
+                    while (reader.Read())
+                    {
+                        int eventID = Int32.Parse(reader["eventID"].ToString());
+                        ret.Add(eventID);
+                        i++;
+                    }
+                con.Close();
+            }
+            return ret;
+        }
+
+        // GET <SurveyController>/invited/nonresponded/{userID}
+        /**
+         * <param name="userID">The ID of the user whos invites are being requested</param>
+         * <returns>Ids of all surveys who the user has been invited and responded to</returns>
+         */
+        [HttpGet("invited/responded/{userID:int}")]
+        [Produces("application/json")]
+        public List<int> getInvitedSurveysAnswered(int userID)
+        {
+            List<int> ret = new List<int>();
+            string conString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
+
+            DBCon conGen = new DBCon(conString);
+            MySqlConnection con = conGen.GetConnection();
+
+            using (con)
+            {
+                con.Open();
+                MySqlCommand getResponses = new MySqlCommand($"SELECT eventID FROM Invites WHERE accountID = {userID} AND answered = 1", con);
+                int i = 0;
+                using (var reader = getResponses.ExecuteReader())
+                    while (reader.Read())
+                    {
+                        int eventID = Int32.Parse(reader["eventID"].ToString());
+                        ret.Add(eventID);
+                        i++;
+                    }
+                con.Close();
+            }
+            return ret;
+        }
+
+        // POST <SurveyController>/respond
+        /**
+         * <param name="create">The Response to be created, provided in the body of the POST, need all fields, if Hour is not wanted use 0 as a placeholder</param>
+         */
         [HttpPost("respond")]
         public void createResponse([FromBody] Response create)
         {
@@ -211,7 +375,11 @@ namespace schedulesUnitedHosted.Server.Controllers
             }
         }
 
-        // POST <SurveyController>
+        // POST <SurveyController>/delete
+        /**
+         * this should only be available to the owner of the survey or the User who submitted the response
+         * <param name="delete">The response to be deleted, provided in the body of the POST</param>
+         */
         [HttpPost("delete")]
         public void deleteResponse([FromBody] Response delete)
         {
@@ -229,7 +397,10 @@ namespace schedulesUnitedHosted.Server.Controllers
             }
         }
 
-        // POST <SurveyController>
+        // POST <SurveyController>/create
+        /**
+         * <param name="create">The survey that is to be created, provided in the body of the POST. The Survey ID field is not required, and should be requested once the survey is created. Additionally, if responses are present they will be added to the survey</param>
+         */
         [HttpPost("create")]
         public void CreateSurvey([FromBody] Survey create)
         {
@@ -256,7 +427,10 @@ namespace schedulesUnitedHosted.Server.Controllers
             }
         }
 
-        // POST <SurveyController>
+        // POST <SurveyController>/edit
+        /**
+         * <param name="combined">The UserSurvey object that holds both the Survey and its Owning User, provided in the body of the POST. Only works if the provided user is the owner of the Survey</param>
+         */
         [HttpPost("edit")]
         public void EditSurvey([FromBody] UserSurvey combined)
         {
@@ -271,7 +445,7 @@ namespace schedulesUnitedHosted.Server.Controllers
                 using (con)
                 {
                     con.Open();
-                    //Delete survey
+                    //Edit survey
                     MySqlCommand editSurvey = new MySqlCommand($"UPDATE CalendarEvents SET eventName = '{DBCon.Clean(edit.name)}', startDate = '{edit.start.ToString("yyyy-MM-dd")}', endDate = '{edit.end.ToString("yyyy-MM-dd")}' WHERE eventID = {edit.id}", con);
                     editSurvey.ExecuteNonQuery();
                     con.Close();
@@ -279,15 +453,19 @@ namespace schedulesUnitedHosted.Server.Controllers
             }
         }
 
-        // POST <SurveyController>
+        // POST <SurveyController>/delete/{id}
+        /**
+         * <param name="combined">The UserSurvey object that holds both the Survey and its Owning User, provided in the body of the POST. Only works if the provided user is the owner of the Survey</param>
+         * <exception cref="Exception">Throws an exception if the User is not the owner of the Survey, or if the survey doesn't exist</exception>
+         */
         [HttpPost("delete/{id:int}")]
         public void DeleteSurvey(int id, [FromBody] User owner)
         {
             User cleaned = DBCon.Clean(owner);
             var survey = getOneSurvey(id);
-            if(survey != null)
+            if (survey != null)
             {
-                if(survey.host == cleaned.accountID)
+                if (survey.host == cleaned.accountID)
                 {
                     string conString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
                     DBCon conGen = new DBCon(conString);
@@ -312,6 +490,26 @@ namespace schedulesUnitedHosted.Server.Controllers
             {
                 throw new Exception("Survey doesn't exist");
             }
+        }
+
+        // POST <SurveyController>/invite/{id}
+        /**
+         * <param name="survey">The The ID of the survey the user is being invited to, to be included in the body of the POST</param>
+         * <param name="id">The id of the user being invited, to be included in the URL</param>
+         */
+        [HttpPost("invite/{id:int}")]
+        public void inviteUser(int id, [FromBody] int survey)
+        {
+            string conString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
+            DBCon conGen = new DBCon(conString);
+            MySqlConnection con = conGen.GetConnection();
+            using (con)
+            {
+                con.Open();
+                MySqlCommand createInvite = new MySqlCommand($"INSERT INTO Invites VALUES (NULL, NULL, {survey}, {id})", con);
+                createInvite.ExecuteNonQuery();
+                con.Close();
+            } 
         }
     }
 }
