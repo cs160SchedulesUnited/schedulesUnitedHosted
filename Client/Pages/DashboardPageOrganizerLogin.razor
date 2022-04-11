@@ -1,0 +1,21 @@
+﻿@page "/organizerDashboardLogin/"
+
+@inject NavigationManager NavigationManager;
+
+<h3>Login</h3>
+
+
+    <RadzenTemplateForm Data=@("SimpleLogin") Action="google.com">
+        <RadzenLogin AllowRegister="false" AllowResetPassword="false" Login="args => OnLogin(args)" />
+    </RadzenTemplateForm>
+
+@code {
+
+
+    void OnLogin(LoginArgs args)
+    {
+        NavigationManager.NavigateTo($"/organizerDashboard/{args.Username}");
+
+    }
+
+}

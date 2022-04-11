@@ -1,6 +1,7 @@
-﻿@page "/responsePage/{surveyId}"
+﻿@page "/responsePage/{survey}"
 @using Radzen.Blazor
 @using System.Linq;
+@using schedulesUnitedHosted.Shared;
 
 @inject Radzen.DialogService dialogService;
 
@@ -9,23 +10,17 @@
 
 <RadzenCard Style="margin: 0px; height: 90vh;">
 
-            <RadzenScheduler Data="@appointments" @ref=@scheduler Style="height: 90%; width: 100%; margin: 0px;" TItem="Appointment" StartProperty="Start" SlotSelect=@OnSlotSelect AppointmentSelect=@OnAppointmentSelect EndProperty="End" TextProperty="Text">
-                <RadzenMonthView />
-            </RadzenScheduler>
+    <RadzenScheduler Data="@appointments" @ref=@scheduler Style="height: 90%; width: 100%; margin: 0px;" TItem="Appointment" StartProperty="Start" SlotSelect=@OnSlotSelect AppointmentSelect=@OnAppointmentSelect EndProperty="End" TextProperty="Text">
+        <RadzenMonthView />
+    </RadzenScheduler>
 
-    @*<div class="row">
-        <div class="col-md-12 text-right">
-            <RadzenButton Click="@((args) => dialogService.Close(false))" ButtonStyle="ButtonStyle.Secondary" Text="Cancel" Style="width: 120px" Class="mr-1" />
-            <RadzenButton Click="@((args) => dialogService.Close(true))" Text="OK" Style="width: 120px" />
-        </div>
-    </div>*@
+   
 </RadzenCard>
 
 
 @code {
 
-
-    [Parameter] public int surveyId { get; set; }
+    [Parameter] public Survey survey { get; set; }
 
     RadzenScheduler<Appointment> scheduler;
 
@@ -51,50 +46,19 @@
         new Appointment { Start = DateTime.Today.AddDays(1), End = DateTime.Today.AddDays(12), Text = "Vacation" },
         };
     }
-    @*DataItem[] data = new DataItem[]
-        {
-          new DataItem
-          {
-            Start = DateTime.Today,
-            End = DateTime.Today.AddDays(1),
-            Text = "Birthday"
-          },
-        };*@
 
 
     async Task OnSlotSelect(SchedulerSlotSelectEventArgs args)
     {
-        //Console.WriteLine($"SlotSelect: Start={args.Start} End={args.End}");
-
-        // Appointment data = await DialogService.OpenAsync<AddAppointmentPage>("Add Appointment",
-        //    new Dictionary<string, object> { { "Start", args.Start }, { "End", args.End } });
-
-
-        // ADD THE APPOINTMENT VIEW. NO NEED TO CALL ABOVE METHOD. CAN JUST CALL 'data.Add(timeSlot)' AND THEN RELOAD
-
-
 
         appointments.Add(new Appointment { Start = args.Start, End = args.End, Text = "New Event" });
         await scheduler.Reload();
-        //if (data != null)
-        //{
-        //  appointments.Add(data);
-        // Either call the Reload method or reassign the Data property of the Scheduler
-        //   await scheduler.Reload();
-        //}
-
+    
     }
 
 
     async Task OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<Appointment> args)
     {
-        @*console.Log($"AppointmentSelect: Appointment={args.Data.Text}");
-
-            await DialogService.OpenAsync<EditAppointmentPage>("Edit Appointment", new Dictionary<string, object> { { "Appointment", args.Data } });
-
-            await scheduler.Reload();*@
-        //Appointment app = new Appointment { Start = args.Start, End = args.End, Text=args.Data.Text };
-
         Appointment app = appointments.Where(p => p.Start.Equals(args.Start) && p.End.Equals(args.End) && p.Start.Equals(args.Start)).FirstOrDefault();
 
         appointments.RemoveAt(appointments.IndexOf(app));

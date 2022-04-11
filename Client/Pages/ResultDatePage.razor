@@ -1,13 +1,29 @@
-﻿@page "/resultDate"
+﻿@page "/resultDate/{survey}"
 @using Radzen.Blazor
+@using schedulesUnitedHosted.Shared;
+
+
+@inject Radzen.DialogService dialogService;
 
 <h3>Component1</h3>
 
 <RadzenScheduler Data="@appointments" Style="height: 700px; padding-bottom: 30px;" TItem="Appointment" StartProperty="Start" EndProperty="End" TextProperty="Text">
     <RadzenMonthView />
 </RadzenScheduler>
+<div style="width: 100%;">
+    <RadzenCard Style="float: left; width: 50%; height: 100%;">
+        <h4>Responded</h4>
+        <RadzenListBox Data=@respondedList TValue="string" Style="max-height: 200px;"/>
+    </RadzenCard>
+    <RadzenCard Style=" width: 50%; height: 100%;">
+        <h4>Not Yet Responded</h4>
+        <RadzenListBox Data=@notRespondedList TValue="string" Style="max-height: 200px;"/>
+    </RadzenCard>
+</div>
 
 @code {
+
+    [Parameter] public Survey survey { get; set; }
 
     class Appointment
     {
@@ -26,9 +42,15 @@
         new Appointment { Start = DateTime.Today.AddHours(14), End = DateTime.Today.AddHours(14).AddMinutes(30), Text = "Dentist appointment" },
         new Appointment { Start = DateTime.Today.AddDays(1), End = DateTime.Today.AddDays(12), Text = "Vacation" },
     };
+    //NOT ALLOWED TO HAVE DUPLICATE VALUES IN RESPONDED AND NON RESPONDED LIST
+    IEnumerable<string> notRespondedList = new List<string> { "Person 4", "Person 5", "Person 6", };
+    IEnumerable<string> respondedList = new List<string> { "Person 1", "Person 2", "Person 3" };
 
-    //on render percentage of color per person not attendign added to percent attending
-    // other wise alpha value
-    // optional : most available times be a diff brighter color
+
+    protected override void OnInitialized()
+    {
+        Console.WriteLine(survey.ToString());
+    }
+
 
 }
