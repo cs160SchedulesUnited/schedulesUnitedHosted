@@ -8,15 +8,17 @@ namespace schedulesUnitedHosted.Shared
     {
         public List<Response> Responses { get; set; }
 
-        public DateTime start { get; set; }
+        public DateTime start { get; set; } = DateTime.Today;
 
-        public DateTime end { get; set; }
+        public DateTime end { get; set; } = DateTime.Today;
 
         public int host { get; set; }
 
         public int id { get; set; }
 
         public string name { get; set; }
+
+        public int dateType { get; set; } = 1;
 
         public Survey(int id, string name, DateTime start, DateTime end, int host, List<Response> Responses)
         {
@@ -28,6 +30,28 @@ namespace schedulesUnitedHosted.Shared
             this.name = name;
         }
 
+
+        public Survey(int id, string name, DateTime start, DateTime end, int dateType, int host, List<Response> Responses)
+        {
+            this.Responses = Responses;
+            this.start = start;
+            this.end = end;
+            this.host = host;
+            this.id = id;
+            this.name = name;
+            this.dateType = dateType;
+        }
+
+
+
+
+
+
+
+
+
+        public Survey() { }
+
         public Survey(string name, DateTime start, DateTime end, int host, List<Response> Responses)
         {
             this.Responses = Responses;
@@ -37,6 +61,25 @@ namespace schedulesUnitedHosted.Shared
             this.id = 0;
             this.name = name;
         }
+
+
+
+
+        public Survey(string name, DateTime start, DateTime end, int dateType, int host, List<Response> Responses)
+        {
+            this.Responses = Responses;
+            this.start = start;
+            this.end = end;
+            this.host = host;
+            this.id = 0;
+            this.name = name;
+            this.dateType = dateType;
+        }
+
+
+
+
+
 
         public string ToString()
         {

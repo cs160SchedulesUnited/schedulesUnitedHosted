@@ -1,0 +1,120 @@
+﻿@page "/organizerDashboard/{organizerID}"
+@using Radzen.Blazor;
+@using schedulesUnitedHosted.Shared;
+@inject DialogService DialogService;
+@implements IDisposable;
+@inject NavigationManager NavigationManager;
+
+<h3>Organizer Dashboard</h3>
+
+<RadzenDataList WrapItems="true" AllowPaging="true" Data="@surveys" TItem="Survey" PageSize="5" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true">
+    <Template Context="survey">
+        <RadzenCard Style="width: 100%; padding: 0; overflow: hidden;">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-3 p-3 product-title">
+                        @(survey.name)
+                    </div>
+                    <div class="col-lg-7 p-3">
+                        <div class="row d-flex">
+                            <div class="col-md-6 col-lg-2">
+                                <h5 class="mb-0">Host</h5>
+                                <p class="mb-sm-2 mb-lg-0">@(survey.host)</p>
+                            </div>
+                            <div class="col-md-6 col-lg-2">
+                                <h5 class="mb-0">DateType</h5>
+                                <p class="mb-sm-2 mb-lg-0">@(survey.dateType)</p>
+                            </div>
+                            <div class="col-md-6 col-lg-5">
+                                <h5 class="mb-0">Start</h5>
+                                <p class="mb-sm-2 mb-lg-0">@(survey.start)</p>
+                            </div>
+                            <div class="col-md-6 order-first order-lg-last col-lg-3 text-sm-left text-lg-right mb-3 mb-lg-0">
+                                <RadzenBadge BadgeStyle="BadgeStyle.Secondary" Class="price-badge" Text=@(survey.Responses.Count.ToString()) />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 p-3">
+                        <RadzenButton Text="Manage" Click="@(args => OnClick(survey))" Class="w-100" />
+                    </div>
+                </div>
+            </div>
+        </RadzenCard>
+    </Template>
+</RadzenDataList>
+
+
+<style>
+    .product-title {
+        min-height: 72px;
+        color: #da0074;
+        background-color: rgba(255, 41, 155, .1);
+        font-size: 20px;
+        font-weight: bold;
+        line-height: 20px;
+        letter-spacing: -0.02em;
+    }
+
+    .price-badge {
+        font-size: 16px;
+        font-weight: bold;
+        line-height: 20px;
+        padding: 8px;
+    }
+</style>
+
+@code {
+
+    [Parameter]
+    public string OrganizerID { get; set; }
+
+
+    IList<Survey> surveys = new List<Survey> {
+
+        new Survey(45, "survey 1", DateTime.Today, DateTime.Today.AddDays(1), 410, new List<Response>()),
+        new Survey(46, "survey 2", DateTime.Today, DateTime.Today.AddDays(1), 420, new List<Response>()),
+        new Survey(47, "survey 3", DateTime.Today, DateTime.Today.AddDays(1), 430, new List<Response>()),
+        new Survey(48, "survey 4", DateTime.Today, DateTime.Today.AddDays(1), 440, new List<Response>()),
+        new Survey(49, "survey 5", DateTime.Today, DateTime.Today.AddDays(1), 450, new List<Response>()),
+        new Survey(50, "survey 6", DateTime.Today, DateTime.Today.AddDays(1), 460, new List<Response>())
+    };
+
+    public async Task OnClick(Survey survey)
+    {
+        Console.WriteLine(survey.ToString());
+        //take id to next page
+        //NavigationManager.NavigateTo($"/responsePage/{surveyId}");
+        await DialogService.OpenAsync<ResultDatePage>($"Name {survey.name}",
+               new Dictionary<string, object>() { { "survey", survey } },
+               new DialogOptions() { Width = "100%", Height = "100%", Resizable = true, Draggable = true });
+    }
+
+    protected override void OnInitialized()
+    {
+        DialogService.OnOpen += Open;
+        DialogService.OnClose += Close;
+
+
+    }
+
+
+
+    public void Dispose()
+    {
+        // The DialogService is a singleton so it is advisable to unsubscribe.
+        DialogService.OnOpen -= Open;
+        DialogService.OnClose -= Close;
+    }
+
+    void Open(string title, Type type, Dictionary<string, object> parameters, DialogOptions options)
+    {
+        Console.WriteLine("Dialog opened");
+    }
+
+    void Close(dynamic result)
+    {
+        Console.WriteLine($"Dialog closed");
+    }
+
+
+}

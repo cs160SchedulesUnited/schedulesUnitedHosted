@@ -1,0 +1,68 @@
+﻿@page "/responsePage/{survey}"
+@using Radzen.Blazor
+@using System.Linq;
+@using schedulesUnitedHosted.Shared;
+
+@inject Radzen.DialogService dialogService;
+
+
+
+
+<RadzenCard Style="margin: 0px; height: 90vh;">
+
+    <RadzenScheduler Data="@appointments" @ref=@scheduler Style="height: 90%; width: 100%; margin: 0px;" TItem="Appointment" StartProperty="Start" SlotSelect=@OnSlotSelect AppointmentSelect=@OnAppointmentSelect EndProperty="End" TextProperty="Text">
+        <RadzenMonthView />
+    </RadzenScheduler>
+
+   
+</RadzenCard>
+
+
+@code {
+
+    [Parameter] public Survey survey { get; set; }
+
+    RadzenScheduler<Appointment> scheduler;
+
+    class Appointment
+    {
+        public DateTime Start { get; set; }
+        public DateTime End { get; set; }
+        public string Text { get; set; }
+    }
+    IList<Appointment> appointments;
+
+
+    protected override void OnInitialized()
+    {
+        appointments = new List<Appointment>
+{
+        new Appointment { Start = DateTime.Today.AddDays(-2), End = DateTime.Today.AddDays(-2), Text = "Birthday" },
+        new Appointment { Start = DateTime.Today.AddDays(-11), End = DateTime.Today.AddDays(-10), Text = "Day off" },
+        new Appointment { Start = DateTime.Today.AddDays(-10), End = DateTime.Today.AddDays(-8), Text = "Work from home" },
+        new Appointment { Start = DateTime.Today.AddHours(10), End = DateTime.Today.AddHours(12), Text = "Online meeting" },
+        new Appointment { Start = DateTime.Today.AddHours(10), End = DateTime.Today.AddHours(13), Text = "Skype call" },
+        new Appointment { Start = DateTime.Today.AddHours(14), End = DateTime.Today.AddHours(14).AddMinutes(30), Text = "Dentist appointment" },
+        new Appointment { Start = DateTime.Today.AddDays(1), End = DateTime.Today.AddDays(12), Text = "Vacation" },
+        };
+    }
+
+
+    async Task OnSlotSelect(SchedulerSlotSelectEventArgs args)
+    {
+
+        appointments.Add(new Appointment { Start = args.Start, End = args.End, Text = "New Event" });
+        await scheduler.Reload();
+    
+    }
+
+
+    async Task OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<Appointment> args)
+    {
+        Appointment app = appointments.Where(p => p.Start.Equals(args.Start) && p.End.Equals(args.End) && p.Start.Equals(args.Start)).FirstOrDefault();
+
+        appointments.RemoveAt(appointments.IndexOf(app));
+
+        await scheduler.Reload();
+    }
+}
