@@ -13,6 +13,12 @@ namespace schedulesUnitedHosted.Shared
         public string username { get; set; }
 
         public string password { get; set; }
+
+        public User()
+        {
+
+        }
+
         public User(int accountID, string name, string username, string password)
         {
             this.accountID = accountID;

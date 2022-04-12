@@ -80,6 +80,7 @@ namespace schedulesUnitedHosted.Shared
             byte[] salt = Encoding.GetEncoding("iso-8859-1").GetBytes(hash.Substring(0, 8));
             Rfc2898DeriveBytes RFCDB = new Rfc2898DeriveBytes(pass, salt, 10000);
             String comp = Encoding.GetEncoding("iso-8859-1").GetString(salt) + Encoding.ASCII.GetString(RFCDB.GetBytes(20));
+            
             if (comp == hash) return true;
             else return false;
         }

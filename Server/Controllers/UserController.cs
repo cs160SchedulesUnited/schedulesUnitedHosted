@@ -78,7 +78,7 @@ namespace schedulesUnitedHosted.Server.Controllers
         /**
          * <param name="person">Takes a User object as input from the body of the POST, userID is not needed in the provided User, once you create the user, you must call getUserId in order to get the correct UserId</param>
          */
-        [HttpPost]
+        [HttpPost("/create")]
         public void createUser([FromBody] User person)
         {
             User cleaned = DBCon.Clean(person);
@@ -102,7 +102,7 @@ namespace schedulesUnitedHosted.Server.Controllers
                 if (ret == null)
                 {
                     //Create user
-                    MySqlCommand createUser = new MySqlCommand($"INSERT INTO Accounts VALUES (NULL, '{name}', '{username}', '{password}')", con);
+                    MySqlCommand createUser = new MySqlCommand($"INSERT INTO Accounts (personName, username, accountPassword) VALUES ('{name}', '{username}', '{password}')", con);
                     createUser.ExecuteNonQuery();
                 }
                 else
@@ -156,6 +156,7 @@ namespace schedulesUnitedHosted.Server.Controllers
         [HttpPost("/validate")]
         public Boolean Validate([FromBody] User person)
         {
+            Utilities util = new Utilities();
             User cleaned = DBCon.Clean(person);
             User ret = null;
             string conString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
@@ -180,7 +181,7 @@ namespace schedulesUnitedHosted.Server.Controllers
                     throw new Exception("Username and/or Password incorrect");
                     return false;
                 }
-                else if(ret.username.Equals(username) && ret.password.Equals(password))
+                else if(ret.password.Equals(password))
                 {
                     // No error means a correct validation
                     return true;
