@@ -1,15 +1,30 @@
 ﻿@page "/organizerDashboardLogin/"
 
 @inject NavigationManager NavigationManager;
+@inject DialogService DialogService;
+
 
 <h3>Login</h3>
 
 
-    <RadzenTemplateForm Data=@("SimpleLogin") Action="google.com">
-        <RadzenLogin AllowRegister="false" AllowResetPassword="false" Login="args => OnLogin(args)" />
-    </RadzenTemplateForm>
+
+<RadzenTemplateForm Data=@("SimpleLogin") Action="google.com" Style="width: 50%;">
+    <RadzenLogin AllowResetPassword="false" Login=@(args => OnLogin(args)) Register=@(args => OnRegister()) />
+</RadzenTemplateForm>
 
 @code {
+
+
+    class User
+    {
+
+        public string Name { get; set; }
+        public string Username { get; set; }
+        public string Password { get; set; }
+        public string RPassword { get; set; }
+    }
+    User user = new User();
+
 
 
     void OnLogin(LoginArgs args)
@@ -17,5 +32,46 @@
         NavigationManager.NavigateTo($"/organizerDashboard/{args.Username}");
 
     }
+    async void OnRegister()
+    {
+        await DialogService.OpenAsync("Register", ds =>
 
+    //can add any other fields required. if the validator had diff req, there are other available
+    @<div>
+        <RadzenTemplateForm TItem="User" Data="@user" Submit=RegisterUser>
+            <RadzenFieldset Text="Personal information">
+                <div style="margin:25px;">
+                    <RadzenTextBox @bind-Value="@user.Name" Placeholder="Name" Name="Name" Class="w-100" />
+                    <RadzenRequiredValidator Component="Name" Text="Name is required" Popup=true Style="position: absolute" />
+                </div>
+                <div style="margin:25px;">
+                    <RadzenTextBox @bind-Value="@user.Username" Name="Username" Placeholder="Username" Class="w-100" />
+                    <RadzenRequiredValidator Component="Username" Text="Username is required" Popup=true Style="position: absolute" />
+                </div>
+                <div style="margin:25px;">
+                    <RadzenPassword @bind-Value="@user.Password" Name="Password" Placeholder="Enter password" Class="w-100" />
+                    <RadzenRequiredValidator Component="Password" Text="Password is required" Popup=true Style="position: absolute" />
+                </div>
+                <div style="margin:25px;">
+                    <RadzenPassword @bind-Value="@user.RPassword" Name="RPassword" Placeholder="Confirm password" Class="w-100" />
+                    <RadzenRequiredValidator Component="RPassword" Text="Confirm Password is required" Popup=true Style="position: absolute" />
+                    <RadzenCompareValidator Visible=@(!string.IsNullOrEmpty(user.RPassword)) Value=@user.Password Component="RPassword" Text="Passwords should be the same" Popup=true Style="position: absolute" />
+                </div>
+                <RadzenButton ButtonType="ButtonType.Submit" Style="margin: 25px;" Text="Submit" />
+            </RadzenFieldset>
+        </RadzenTemplateForm>
+    </div>);
+
+  }
+  void RegisterUser()
+  {
+        // validation already done
+
+      //reigster the user
+
+      //go to next page
+      NavigationManager.NavigateTo($"/organizerDashboard/{user.Username}");
+
+
+  }
 }
