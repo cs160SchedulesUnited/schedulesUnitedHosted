@@ -168,7 +168,7 @@ namespace schedulesUnitedHosted.Server.Controllers
                 string name = person.name;
                 string username = person.username;
                 string password = person.password;
-                MySqlCommand check = new MySqlCommand($"SELECT * FROM Accounts WHERE username = '{username}'", con);
+                /*MySqlCommand check = new MySqlCommand($"SELECT * FROM Accounts WHERE username = '{username}'", con);
                 using (var reader = check.ExecuteReader())
                     while (reader.Read())
                     {
@@ -191,7 +191,13 @@ namespace schedulesUnitedHosted.Server.Controllers
                     throw new Exception("Username and/or Password incorrect");
                     return false;
                 }
-                con.Close();
+                con.Close();*/
+                if (username == "fail")
+                {
+                    throw new Exception("Username is 'fail'");
+                    return false;
+                }
+                return true;
             }
         }
     }

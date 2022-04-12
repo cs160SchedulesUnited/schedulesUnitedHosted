@@ -1,31 +1,33 @@
 ﻿@page "/participantDashboardLogin/"
-
+@using schedulesUnitedHosted.Shared
+@using System.Net.Http
+@using System.Net.Http.Json
+@inject HttpClient Http
 @inject NavigationManager NavigationManager;
 @inject DialogService DialogService;   
 
 <h3>Login</h3>
 
-<RadzenTemplateForm Data=@("SimpleLogin") Action="" Style="width: 50%;">
-    <RadzenLogin AllowResetPassword="false" Login="args => OnLogin(args)" Register=@(args => OnRegister()) />
+<RadzenTemplateForm Data=@("SimpleLogin") Style="width: 50%;">
+    <RadzenLogin AllowResetPassword="false" Login=@OnLogin Register=@OnRegister/>
 </RadzenTemplateForm>
 
 @code {
 
 
-    class User
+    async Task OnLogin(LoginArgs args)
     {
-
-        public string Name { get; set; }
-        public string Username { get; set; }
-        public string Password { get; set; }
-        public string RPassword { get; set; }
-    }
-    User user = new User();
-
-    void OnLogin(LoginArgs args)
-    {
-        NavigationManager.NavigateTo($"/participantDashboard/{args.Username}");
-
+        try
+            {
+                User body = new User("aaaaaa", args.Username, args.Password);
+                var resp = await Http.PostAsJsonAsync<User>("/validate", body);
+                Console.WriteLine(resp);
+                NavigationManager.NavigateTo($"/participantDashboard/{args.Username}");
+            }catch(Exception e)
+            {
+                var resp = e.Message + "\n" + e.StackTrace;
+                Console.WriteLine(resp);
+            }
     }
 
 
