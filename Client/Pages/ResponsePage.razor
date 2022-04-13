@@ -50,8 +50,8 @@
 
     async Task OnSlotSelect(SchedulerSlotSelectEventArgs args)
     {
-
-        appointments.Add(new Appointment { Start = args.Start, End = args.End, Text = "New Event" });
+        
+        appointments.Add(new Appointment { Start = args.Start, End = args.End, Text = "Busy" });
         await scheduler.Reload();
     
     }
