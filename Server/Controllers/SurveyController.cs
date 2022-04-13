@@ -401,30 +401,32 @@ namespace schedulesUnitedHosted.Server.Controllers
         /**
          * <param name="create">The survey that is to be created, provided in the body of the POST. The Survey ID field is not required, and should be requested once the survey is created. Additionally, if responses are present they will be added to the survey</param>
          */
-        [HttpPost("create")]
+        [HttpPost("/create")]
         public void CreateSurvey([FromBody] Survey create)
         {
-            string conString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
-            DBCon conGen = new DBCon(conString);
-            MySqlConnection con = conGen.GetConnection();
-            using (con)
-            {
-                con.Open();
-                //Create survey
-                MySqlCommand createSurvey = new MySqlCommand($"INSERT INTO CalendarEvents VALUES (NULL, '{create.name}', '{create.start.ToString("yyyy-MM-dd")}', '{create.end.ToString("yyyy-MM-dd")}', {create.host})", con);
-                createSurvey.ExecuteNonQuery();
-                con.Close();
-            }
-            if (create.Responses.Count > 0)
-            {
-                int id = getSurveyID(create.name, create.host);
-                for(int i = 0; i < create.Responses.Count; i++)
+            
+                string conString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
+                DBCon conGen = new DBCon(conString);
+                MySqlConnection con = conGen.GetConnection();
+                using (con)
                 {
-                    Response temp = create.Responses[i];
-                    temp.EventId = id;
-                    createResponse(create.Responses[i]);
+                    con.Open();
+                    //Create survey
+                    MySqlCommand createSurvey = new MySqlCommand($"INSERT INTO CalendarEvents VALUES (NULL, '{create.name}', '{create.start.ToString("yyyy-MM-dd")}', '{create.end.ToString("yyyy-MM-dd")}', {create.host})", con);
+                    createSurvey.ExecuteNonQuery();
+                    con.Close();
                 }
-            }
+                if (create.Responses.Count > 0)
+                {
+                    int id = getSurveyID(create.name, create.host);
+                    for (int i = 0; i < create.Responses.Count; i++)
+                    {
+                        Response temp = create.Responses[i];
+                        temp.EventId = id;
+                        createResponse(create.Responses[i]);
+                    }
+                }
+           
         }
 
         // POST <SurveyController>/edit

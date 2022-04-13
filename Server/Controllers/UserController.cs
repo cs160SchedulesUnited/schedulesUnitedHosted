@@ -50,7 +50,7 @@ namespace schedulesUnitedHosted.Server.Controllers
          * <param name="username">The username of the desired userid is to be included in the URL</param>
          * <returns>User id, or 0 if user is not found</returns>
          */
-        [HttpGet("id/{username}")]
+        [HttpGet("/id/{username}")]
         [Produces("application/json")]
         public int getUserID(string username)
         {
@@ -178,7 +178,7 @@ namespace schedulesUnitedHosted.Server.Controllers
                 if (ret == null)
                 {
                     // Credentials incorrect, throw an error
-                    throw new Exception("Username and/or Password incorrect");
+                    //throw new Exception("Username and/or Password incorrect");
                     return false;
                 }
                 else if(ret.password.Equals(password))
@@ -189,7 +189,7 @@ namespace schedulesUnitedHosted.Server.Controllers
                 else
                 {
                     // Credentials incorrect, throw an error
-                    throw new Exception("Username and/or Password incorrect");
+                    //throw new Exception("Username and/or Password incorrect");
                     return false;
                 }
                 con.Close();
