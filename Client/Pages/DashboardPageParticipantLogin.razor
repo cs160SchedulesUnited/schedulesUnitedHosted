@@ -6,21 +6,35 @@
 @inject NavigationManager NavigationManager;
 @inject DialogService DialogService;   
 
+
 <h3>Login</h3>
 
-<RadzenTemplateForm Data=@("SimpleLogin") Style="width: 50%;">
-    <RadzenLogin AllowResetPassword="false" Login=@OnLogin Register=@OnRegister/>
-</RadzenTemplateForm>
 
+
+<RadzenTemplateForm Data=@("SimpleLogin") Style="width: 50%;">
+    <RadzenLogin AllowResetPassword="false" Login="@OnLogin" Register="@OnRegister"/>
+</RadzenTemplateForm>
+    
 @code {
 
+    Utilities util = new Utilities();
+
+    class User
+    {
+
+        public string Name { get; set; }
+        public string Username { get; set; }
+        public string Password { get; set; }
+        public string RPassword { get; set; }
+    }
+    User user = new User();
 
     async Task OnLogin(LoginArgs args)
     {
         try
             {
-                User body = new User("aaaaaa", args.Username, args.Password);
-                var resp = await Http.PostAsJsonAsync<User>("/validate", body);
+                schedulesUnitedHosted.Shared.User body = new schedulesUnitedHosted.Shared.User("user", args.Username, args.Password);
+                var resp = await Http.PostAsJsonAsync<schedulesUnitedHosted.Shared.User>("/validate", body);
                 Console.WriteLine(resp);
                 NavigationManager.NavigateTo($"/participantDashboard/{args.Username}");
             }catch(Exception e)
@@ -29,6 +43,7 @@
                 Console.WriteLine(resp);
             }
     }
+
 
 
     async void OnRegister()
@@ -62,11 +77,22 @@
     </div>);
 
     }
-    void RegisterUser()
+
+    async Task RegisterUser()
     {
         // validation already done
 
-        //reigster the user
+      //reigster the user
+      try
+            {
+                schedulesUnitedHosted.Shared.User toAdd = new schedulesUnitedHosted.Shared.User(user.Name, user.Username, user.Password);
+                var resp = await Http.PostAsJsonAsync<schedulesUnitedHosted.Shared.User>("/create", toAdd);
+                Console.WriteLine(resp);
+            }catch(Exception e)
+            {
+                var resp = e.Message + "\n" + e.StackTrace;
+                Console.WriteLine(resp);
+            }
 
         //go to next page
         Console.WriteLine($"{user.Password} + {user.RPassword}");
