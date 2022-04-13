@@ -3,10 +3,13 @@
 @using schedulesUnitedHosted.Shared;
 @inject DialogService DialogService;
 @implements IDisposable;
+@inject HttpClient Http;
+
 @inject NavigationManager NavigationManager;
 
 <h3>Organizer Dashboard</h3>
 
+<RadzenButton Click=@AddNewSurvey Text="Add New" Icon="add_circle_outline" ButtonStyle="ButtonStyle.Secondary" />
 <RadzenDataList WrapItems="true" AllowPaging="true" Data="@surveys" TItem="Survey" PageSize="5" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true">
     <Template Context="survey">
         <RadzenCard Style="width: 100%; padding: 0; overflow: hidden;">
@@ -79,6 +82,11 @@
         new Survey(50, "survey 6", DateTime.Today, DateTime.Today.AddDays(1), 460, new List<Response>())
     };
 
+    public async Task AddNewSurvey()
+    {
+        NavigationManager.NavigateTo($"/createSurvey/{OrganizerID}");
+    }
+
     public async Task OnClick(Survey survey)
     {
         Console.WriteLine(survey.ToString());
@@ -89,11 +97,24 @@
                new DialogOptions() { Width = "100%", Height = "100%", Resizable = true, Draggable = true });
     }
 
-    protected override void OnInitialized()
+    protected async override void OnInitialized()
     {
         DialogService.OnOpen += Open;
         DialogService.OnClose += Close;
 
+
+
+        //////////// TEST
+
+        try
+        {
+            var resp = await Http.GetFromJsonAsync<int>($"/surveys/{OrganizerID}");
+            Console.WriteLine(resp);
+        } catch (Exception ex)
+        {
+            var resp = ex.Message + "\n" + ex.StackTrace;
+            Console.WriteLine(resp);
+        }
 
     }
 

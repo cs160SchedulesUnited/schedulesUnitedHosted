@@ -1,20 +1,21 @@
-﻿@page "/createSurvey"
+﻿@page "/createSurvey/{organizerID}"
 @using Radzen.Blazor
+@inject HttpClient Http;
 @using schedulesUnitedHosted.Shared
 
 <h1>Create Survey for participants</h1>
 
 <RadzenCard>
 
-        <div class="row">
-            <div class="col-md-4 align-items-center d-flex">
-                <RadzenLabel Text="Name" />
-            </div>
-            <div class="col-md-8">
-                <RadzenTextBox @bind-Value="survey.name" />
-            </div>
+    <div class="row">
+        <div class="col-md-4 align-items-center d-flex">
+            <RadzenLabel Text="Name" />
         </div>
-        @*<div class="row">
+        <div class="col-md-8">
+            <RadzenTextBox @bind-Value="survey.name" />
+        </div>
+    </div>
+    @*<div class="row">
             <div class="col-md-4 align-items-center d-flex">
                 <RadzenLabel Text="Email" />
             </div>
@@ -22,52 +23,101 @@
                 <RadzenTextBox @bind-Value="survey.email" Class="w-100" />
             </div>
         </div>*@
-        <div class="row">
-            <div class="col-md-4 align-items-center d-flex">
-                <RadzenLabel Text="Start Date" />
-            </div>
-            <div class="col-md-8">
-                <RadzenDatePicker @bind-Value='survey.start' Inline="true" DateFormat="d" />
-            </div>
+    <div class="row">
+        <div class="col-md-4 align-items-center d-flex">
+            <RadzenLabel Text="Start Date" />
         </div>
-        <div class="row">
-            <div class="col-md-4 align-items-center d-flex">
-                <RadzenLabel Text="End Date" />
-            </div>
-            <div class="col-md-8">
-                <RadzenDatePicker  @bind-Value='survey.end' Inline="true" DateFormat="d" />
-            </div>
+        <div class="col-md-8">
+            <RadzenDatePicker @bind-Value='survey.start' Inline="true" DateFormat="d" />
         </div>
-        <div class="row">
-            <div class="col-md-4 align-items-center d-flex">
-                <RadzenLabel Text="Response Type" />
-            </div>
-            <div class="col-md-8">
-                <RadzenRadioButtonList @bind-Value='survey.dateType' TValue="int" Orientation="Orientation.Vertical">
-                    <Items>
-                        <RadzenRadioButtonListItem Text="Date" Value="1" />
-                        <RadzenRadioButtonListItem Text="Time" Value="2" />
-                    </Items>
-                </RadzenRadioButtonList>
-            </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 align-items-center d-flex">
+            <RadzenLabel Text="End Date" />
         </div>
-
-        <div class="row justify-content-center">
-            <div class="col-md-12 d-flex align-items-end justify-content-center" style="margin-top: 16px;">
-                <RadzenButton ButtonType="ButtonType.Submit" Icon="save" Text="Submit" Click="@Submit" />
-                
-            </div>
+        <div class="col-md-8">
+            <RadzenDatePicker @bind-Value='survey.end' Inline="true" DateFormat="d" />
         </div>
-    </RadzenCard>
+    </div>
+    <div class="row">
+        <div class="col-md-4 align-items-center d-flex">
+            <RadzenLabel Text="Response Type" />
+        </div>
+        <div class="col-md-8">
+            <RadzenRadioButtonList @bind-Value='survey.dateType' TValue="int" Orientation="Orientation.Vertical">
+                <Items>
+                    <RadzenRadioButtonListItem Text="Date" Value="1" />
+                    <RadzenRadioButtonListItem Text="Time" Value="2" />
+                </Items>
+            </RadzenRadioButtonList>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 align-items-center d-flex">
+            <RadzenLabel Text="Invitees" />
+        </div>
+        <div class="col-md-8">
+            <RadzenTextArea @bind-Value="value" Placeholder="Separate by comma" Class="w-100" />
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-md-12 d-flex align-items-end justify-content-center" style="margin-top: 16px;">
+            <RadzenButton ButtonType="ButtonType.Submit" Icon="save" Text="Submit" Click="@Submit" />
+
+        </div>
+    </div>
+</RadzenCard>
 
 
-    @code {
+@code {
+
+    [Parameter]
+    public string OrganizerID { get; set; }
 
 
-        Survey survey = new Survey();
-        void Submit()
+    string value;
+
+
+    Survey survey = new Survey();
+
+    async void Submit()
+    {
+        survey.host = int.Parse(OrganizerID);
+
+        Console.WriteLine(survey.ToString());
+
+
+
+        //////////// TEST
+
+        try
         {
-            Console.WriteLine(survey.ToString());
+            //should be post
+            //var resp = await Http.PostAsJsonAsync<schedulesUnitedHosted.Shared.Survey>("create", survey);
+            Console.WriteLine(resp);
+
+
+
+            ////TEST
+            ///
+            List<string> inviteeIDs = value.Replace(" ", "").Split(',').ToList();
+
+            foreach (string inviteeID in inviteeIDs)
+            {
+
+                //should be post
+                //var respInvite = await Http.PostAsJsonAsync<int>("invite/{id:int}", survey.id, int.Parse(inviteeID));
+                Console.WriteLine(respInvite);
+            }
+
+
+        }
+        catch (Exception ex)
+        {
+            var resp = ex.Message + "\n" + ex.StackTrace;
+            Console.WriteLine(resp);
         }
 
     }
+
+}

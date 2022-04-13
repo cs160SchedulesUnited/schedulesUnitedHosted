@@ -52,30 +52,6 @@ namespace schedulesUnitedHosted.Shared
 
         public Survey() { }
 
-        public Survey(string name, DateTime start, DateTime end, int host, List<Response> Responses)
-        {
-            this.Responses = Responses;
-            this.start = start;
-            this.end = end;
-            this.host = host;
-            this.id = 0;
-            this.name = name;
-        }
-
-
-
-
-        public Survey(string name, DateTime start, DateTime end, int dateType, int host, List<Response> Responses)
-        {
-            this.Responses = Responses;
-            this.start = start;
-            this.end = end;
-            this.host = host;
-            this.id = 0;
-            this.name = name;
-            this.dateType = dateType;
-        }
-
 
 
 
