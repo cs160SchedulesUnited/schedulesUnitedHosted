@@ -53,7 +53,6 @@ namespace schedulesUnitedHosted.Shared
             byte[] hashedPW = RFCDB.GetBytes(20);
             byte[] salt = RFCDB.Salt;
             hashed = Encoding.GetEncoding("iso-8859-1").GetString(salt) + Encoding.ASCII.GetString(hashedPW);
-            Console.WriteLine(hashed);
             return hashed;
         }
 
@@ -84,14 +83,6 @@ namespace schedulesUnitedHosted.Shared
             
             if (comp == hash) return true;
             else return false;
-        }
-
-        public void test()
-        {
-            byte[] salt = Encoding.GetEncoding("iso-8859-1").GetBytes("asdfljkh");
-            Rfc2898DeriveBytes RFCDB = new Rfc2898DeriveBytes("hello", salt, 10000);
-            String comp = Encoding.GetEncoding("iso-8859-1").GetString(salt) + Encoding.ASCII.GetString(RFCDB.GetBytes(20));
-            Console.WriteLine(comp);
         }
     }
 

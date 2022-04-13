@@ -102,10 +102,6 @@ namespace schedulesUnitedHosted.Server.Controllers
                 if (ret == null)
                 {
                     //Create user
-                    Console.WriteLine(name);
-                    Console.WriteLine(username);
-                    Console.WriteLine(password);
-                    Console.WriteLine($"INSERT INTO Accounts (personName, username, accountPassword) VALUES ('{name}', '{username}', '{password}')");
                     MySqlCommand createUser = new MySqlCommand($"INSERT INTO Accounts (personName, username, accountPassword) VALUES ('{name}', '{username}', '{password}')", con);
                     createUser.ExecuteNonQuery();
                 }
@@ -193,10 +189,6 @@ namespace schedulesUnitedHosted.Server.Controllers
                 else
                 {
                     // Credentials incorrect, throw an error
-                    Console.WriteLine(username);
-                    Console.WriteLine(password);
-                    Console.WriteLine(ret.username);
-                    Console.WriteLine(ret.password);
                     throw new Exception("Username and/or Password incorrect");
                     return false;
                 }
