@@ -1,5 +1,8 @@
 ﻿@page "/organizerDashboardLogin/"
-
+@using schedulesUnitedHosted.Shared
+@using System.Net.Http
+@using System.Net.Http.Json
+@inject HttpClient Http
 @inject NavigationManager NavigationManager;
 @inject DialogService DialogService;
 
@@ -8,12 +11,13 @@
 
 
 
-<RadzenTemplateForm Data=@("SimpleLogin") Action="google.com" Style="width: 50%;">
-    <RadzenLogin AllowResetPassword="false" Login=@(args => OnLogin(args)) Register=@(args => OnRegister()) />
+<RadzenTemplateForm Data=@("SimpleLogin") Style="width: 50%;">
+    <RadzenLogin AllowResetPassword="false" Login="@OnLogin" Register="@OnRegister"/>
 </RadzenTemplateForm>
 
 @code {
-
+    
+    Utilities util = new Utilities();
 
     class User
     {
@@ -26,13 +30,21 @@
     User user = new User();
 
 
-
-    void OnLogin(LoginArgs args)
+    async Task OnLogin(LoginArgs args)
     {
-
-        NavigationManager.NavigateTo($"/organizerDashboard/{args.Username}");
-
+        try
+            {
+                schedulesUnitedHosted.Shared.User body = new schedulesUnitedHosted.Shared.User("user", args.Username, args.Password);
+                var resp = await Http.PostAsJsonAsync<schedulesUnitedHosted.Shared.User>("/validate", body);
+                Console.WriteLine(resp);
+                NavigationManager.NavigateTo($"/organizerDashboard/{args.Username}");
+            }catch(Exception e)
+            {
+                var resp = e.Message + "\n" + e.StackTrace;
+                Console.WriteLine(resp);
+            }
     }
+
     async void OnRegister()
     {
         await DialogService.OpenAsync("Register", ds =>
@@ -64,11 +76,22 @@
     </div>);
 
   }
-  void RegisterUser()
+
+  async Task RegisterUser()
   {
         // validation already done
 
       //reigster the user
+      try
+            {
+                schedulesUnitedHosted.Shared.User toAdd = new schedulesUnitedHosted.Shared.User(user.Name, user.Username, user.Password);
+                var resp = await Http.PostAsJsonAsync<schedulesUnitedHosted.Shared.User>("/create", toAdd);
+                Console.WriteLine(resp);
+            }catch(Exception e)
+            {
+                var resp = e.Message + "\n" + e.StackTrace;
+                Console.WriteLine(resp);
+            }
 
       //go to next page
       NavigationManager.NavigateTo($"/organizerDashboard/{user.Username}");
