@@ -10,7 +10,7 @@
 
 <RadzenCard Style="margin: 0px; height: 90vh;">
 
-    <RadzenScheduler Data="@appointments" @ref=@scheduler Style="height: 200px; width: 100%; margin: 0px;" TItem="Appointment" StartProperty="Start" SlotSelect=@OnSlotSelect AppointmentSelect=@OnAppointmentSelect EndProperty="End" TextProperty="Text">
+    <RadzenScheduler Data="@appointments" SlotRender="@OnSlotRender" @ref=@scheduler Style="height: 900px; width: 100%; margin: 0px;" TItem="Appointment" StartProperty="Start" SlotSelect=@OnSlotSelect AppointmentSelect=@OnAppointmentSelect EndProperty="End" TextProperty="Text">
         <RadzenMonthView />
     </RadzenScheduler>
     <RadzenButton Click=OnClick Text="Submit" Icon="check_circle" ButtonStyle="ButtonStyle.Success" />
@@ -21,9 +21,10 @@
 
 @code {
 
-    [Parameter] public int survey { get; set; }
-    [Parameter] public string partID { get; set; }
+        [Parameter] public int survey { get; set; }
+        [Parameter] public string partID { get; set; }
 
+    public Survey surveyFull = new Survey();
     RadzenScheduler<Appointment> scheduler;
 
     class Appointment
@@ -48,8 +49,10 @@
 
             try
             {
-                @*Response r = new Response(partID, );
-                var respUser = await Http.PostFromJsonAsync<Response>($"respond");*@
+                var participantInfo = await Http.GetFromJsonAsync<User>($"user/{partID}");
+                surveyFull = await Http.GetFromJsonAsync<Survey>($"survey/{survey}");
+                Response r = new Response(participantInfo.accountID, surveyFull.id, appointment.Start, 0);
+                var respUser = await Http.PostAsJsonAsync<Response>($"survey/respond", r);
             }
             catch (Exception ex)
             {
@@ -58,11 +61,27 @@
         }
 
     }
+    void OnSlotRender(SchedulerSlotRenderEventArgs args)
+    {
+        if (args.Start < surveyFull.start || args.Start > surveyFull.end)
+        {
+            args.Attributes["style"] = "background: DarkGray";
+        }
+    }
+
 
     async Task OnSlotSelect(SchedulerSlotSelectEventArgs args)
     {
+        if (args.Start > surveyFull.start && args.Start < surveyFull.end)
+        {
 
-        appointments.Add(new Appointment { Start = args.Start, End = args.End, Text = "Busy" });
+
+            if (appointments.Any(a => a.Start != args.Start))
+            {
+                appointments.Add(new Appointment { Start = args.Start, End = args.End, Text = "Busy" });
+
+            }
+        }
         await scheduler.Reload();
 
     }
