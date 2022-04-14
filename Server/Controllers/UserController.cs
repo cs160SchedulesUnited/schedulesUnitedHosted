@@ -162,7 +162,7 @@ namespace schedulesUnitedHosted.Server.Controllers
                 con.Open();
                 try
                 {
-                    Validate(person);
+                    if(Validate(person) == false) throw new Exception("Username and/or Password incorrect");
                     MySqlCommand delete = new MySqlCommand($"DELETE FROM Accounts WHERE username = '{person.username}'", con);
                     delete.ExecuteNonQuery();
                 }
@@ -190,9 +190,11 @@ namespace schedulesUnitedHosted.Server.Controllers
             Utilities util = new Utilities();
             User cleaned = DBCon.Clean(person);
             User ret = null;
+
             string conString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
             DBCon conGen = new DBCon(conString);
             MySqlConnection con = conGen.GetConnection();
+
             using (con)
             {
                 con.Open();

@@ -75,7 +75,7 @@ namespace schedulesUnitedHosted.Server.Controllers
                     {
                         int accountID = Int32.Parse(reader["accountID"].ToString());
                         DateTime availableDay = DateTime.Parse(reader["availableDay"].ToString());
-                        int availableHour = Int32.Parse(reader["availableHour"].ToString());
+                        int availableHour = Int32.Parse(reader["availableTimes"].ToString());
 
                         ret.Add(new Response(accountID, eventID, availableDay, availableHour));
                         i++;
@@ -216,7 +216,7 @@ namespace schedulesUnitedHosted.Server.Controllers
                     while (reader.Read())
                     {
                         DateTime availableDay = DateTime.Parse(reader["availableDay"].ToString());
-                        int availableHour = Int32.Parse(reader["availableHour"].ToString());
+                        int availableHour = Int32.Parse(reader["availableTimes"].ToString());
 
                         ret.Add(new Response(accountID, surveyID, availableDay, availableHour));
                         i++;
