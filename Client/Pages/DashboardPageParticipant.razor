@@ -88,7 +88,7 @@
         //take id to next page
         //NavigationManager.NavigateTo($"/responsePage/{surveyId}");
         await DialogService.OpenAsync<ResponsePage>($"Name {survey.name}",
-               new Dictionary<string, object>() { { "survey", survey } },
+               new Dictionary<string, object>() { { "survey", survey.id }, {"partID", ParticipantID } },
                new DialogOptions() { Width = "100%", Height = "100%", Resizable = true, Draggable = true });
     }
 
@@ -97,6 +97,7 @@
         //function to get surveys
         DialogService.OnOpen += Open;
         DialogService.OnClose += Close;
+
 
         try
         {
