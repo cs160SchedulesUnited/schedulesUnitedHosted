@@ -36,7 +36,7 @@
         try
         {
             schedulesUnitedHosted.Shared.User body = new schedulesUnitedHosted.Shared.User("user", args.Username, args.Password);
-            var resp = await Http.PostAsJsonAsync<schedulesUnitedHosted.Shared.User>("/validate", body);
+            var resp = await Http.PostAsJsonAsync<schedulesUnitedHosted.Shared.User>("validate", body);
             var res = await resp.Content.ReadFromJsonAsync<bool>();
 
             if (res == false)

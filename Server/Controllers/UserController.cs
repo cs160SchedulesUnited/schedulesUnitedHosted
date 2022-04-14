@@ -78,7 +78,7 @@ namespace schedulesUnitedHosted.Server.Controllers
          * <param name="username">The username of the desired userid is to be included in the URL</param>
          * <returns>User id, or 0 if user is not found</returns>
          */
-        [HttpGet("/id/{username}")]
+        [HttpGet("id/{username}")]
         [Produces("application/json")]
         public int getUserID(string username)
         {
