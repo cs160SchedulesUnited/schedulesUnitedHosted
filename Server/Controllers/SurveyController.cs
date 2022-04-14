@@ -38,7 +38,7 @@ namespace schedulesUnitedHosted.Server.Controllers
                     {
                         int accountID = Int32.Parse(reader["accountID"].ToString());
                         DateTime availableDay = DateTime.Parse(reader["availableDay"].ToString());
-                        int availableHour = Int32.Parse(reader["availableHour"].ToString());
+                        int availableHour = Int32.Parse(reader["availableTimes"].ToString());
 
                         ret.Add(new Response(accountID, eventID, availableDay, availableHour));
                         i++;
@@ -370,7 +370,7 @@ namespace schedulesUnitedHosted.Server.Controllers
                 con.Open();
                 //Create survey
                 //throw new Exception($"INSERT INTO Availabilities VALUES ({create.AccId}, {create.EventId}, '{create.Availability.ToString("yyyy-MM-dd")}', {create.Hour})");
-                MySqlCommand createSurvey = new MySqlCommand($"INSERT INTO Availabilities VALUES ({create.AccId}, {create.EventId}, '{create.Availability.ToString("yyyy-MM-dd")}', {create.Hour})", con);
+                MySqlCommand createSurvey = new MySqlCommand($"INSERT INTO Availabilities VALUES (0, {create.AccId}, {create.EventId}, '{create.Availability.ToString("yyyy-MM-dd")}', {create.Hour})", con);
                 createSurvey.ExecuteNonQuery();
                 con.Close();
             }
@@ -393,7 +393,7 @@ namespace schedulesUnitedHosted.Server.Controllers
                 con.Open();
                 //Create survey
                 //throw new Exception($"DELETE FROM Availabilities WHERE accountID = {delete.AccId} AND eventID = {delete.EventId} AND availableDay = '{delete.Availability.ToString("yyyy-MM-dd")}' AND availableHour = {delete.Hour}");
-                MySqlCommand deleteSurvey = new MySqlCommand($"DELETE FROM Availabilities WHERE accountID = {delete.AccId} AND eventID = {delete.EventId} AND availableDay = '{delete.Availability.ToString("yyyy-MM-dd")}' AND availableHour = {delete.Hour}", con);
+                MySqlCommand deleteSurvey = new MySqlCommand($"DELETE FROM Availabilities WHERE accountID = {delete.AccId} AND eventID = {delete.EventId} AND availableDay = '{delete.Availability.ToString("yyyy-MM-dd")}' AND availableTimes = {delete.Hour}", con);
                 deleteSurvey.ExecuteNonQuery();
                 con.Close();
             }
