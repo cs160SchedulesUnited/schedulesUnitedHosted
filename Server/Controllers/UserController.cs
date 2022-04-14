@@ -107,6 +107,7 @@ namespace schedulesUnitedHosted.Server.Controllers
          * <param name="person">Takes a User object as input from the body of the POST, userID is not needed in the provided User, once you create the user, you must call getUserId in order to get the correct UserId</param>
          */
         [HttpPost("create")]
+        [Consumes("application/json")]
         public void createUser([FromBody] User person)
         {
             User cleaned = DBCon.Clean(person);
@@ -148,6 +149,7 @@ namespace schedulesUnitedHosted.Server.Controllers
          * <exception cref="Exception">If the user fails to validate, an exception is thrown</exception>
          */
         [HttpPost("delete")]
+        [Consumes("application/json")]
         public void deleteUser([FromBody] User person)
         {
             User cleaned = DBCon.Clean(person);
@@ -182,6 +184,7 @@ namespace schedulesUnitedHosted.Server.Controllers
          * <returns>Nothing with no errors if the user succesfully validates, might not be the best option</returns>
          */
         [HttpPost("validate")]
+        [Consumes("application/json")]
         public Boolean Validate([FromBody] User person)
         {
             Utilities util = new Utilities();
