@@ -78,7 +78,7 @@ namespace schedulesUnitedHosted.Server.Controllers
          * <param name="username">The username of the desired userid is to be included in the URL</param>
          * <returns>User id, or 0 if user is not found</returns>
          */
-        [HttpGet("/id/{username}")]
+        [HttpGet("id/{username}")]
         [Produces("application/json")]
         public int getUserID(string username)
         {
@@ -106,7 +106,7 @@ namespace schedulesUnitedHosted.Server.Controllers
         /**
          * <param name="person">Takes a User object as input from the body of the POST, userID is not needed in the provided User, once you create the user, you must call getUserId in order to get the correct UserId</param>
          */
-        [HttpPost("/create")]
+        [HttpPost("create")]
         public void createUser([FromBody] User person)
         {
             User cleaned = DBCon.Clean(person);
@@ -147,7 +147,7 @@ namespace schedulesUnitedHosted.Server.Controllers
          * <param name="person">Requires User from body of POST, User object must exactly match the existing user or it throws an error</param>
          * <exception cref="Exception">If the user fails to validate, an exception is thrown</exception>
          */
-        [HttpPost("/delete")]
+        [HttpPost("delete")]
         public void deleteUser([FromBody] User person)
         {
             User cleaned = DBCon.Clean(person);
@@ -181,7 +181,7 @@ namespace schedulesUnitedHosted.Server.Controllers
          * <exception cref="Exception">If the user fails to validate, an exception is thrown</exception>
          * <returns>Nothing with no errors if the user succesfully validates, might not be the best option</returns>
          */
-        [HttpPost("/validate")]
+        [HttpPost("validate")]
         public Boolean Validate([FromBody] User person)
         {
             Utilities util = new Utilities();
