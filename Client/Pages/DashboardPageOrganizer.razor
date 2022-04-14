@@ -3,6 +3,8 @@
 @using schedulesUnitedHosted.Shared;
 @inject DialogService DialogService;
 @implements IDisposable;
+@using System.Net.Http;
+@using System.Net.Http.Json;
 @inject HttpClient Http;
 
 @inject NavigationManager NavigationManager;
@@ -68,11 +70,11 @@
 
 @code {
 
-    [Parameter]
-    public string OrganizerID { get; set; }
+        [Parameter]
+        public string OrganizerID { get; set; }
 
 
-    IList<Survey> surveys = new List<Survey> {
+        IList<Survey> surveys = new List<Survey>() {
 
         new Survey(45, "survey 1", DateTime.Today, DateTime.Today.AddDays(1), 410, new List<Response>()),
         new Survey(46, "survey 2", DateTime.Today, DateTime.Today.AddDays(1), 420, new List<Response>()),
@@ -82,20 +84,20 @@
         new Survey(50, "survey 6", DateTime.Today, DateTime.Today.AddDays(1), 460, new List<Response>())
     };
 
-    public async Task AddNewSurvey()
-    {
-        NavigationManager.NavigateTo($"/createSurvey/{OrganizerID}");
-    }
+        public async Task AddNewSurvey()
+        {
+            NavigationManager.NavigateTo($"/createSurvey/{OrganizerID}");
+        }
 
-    public async Task OnClick(Survey survey)
-    {
-        Console.WriteLine(survey.ToString());
-        //take id to next page
-        //NavigationManager.NavigateTo($"/responsePage/{surveyId}");
-        await DialogService.OpenAsync<ResultDatePage>($"Name {survey.name}",
-               new Dictionary<string, object>() { { "survey", survey } },
-               new DialogOptions() { Width = "100%", Height = "100%", Resizable = true, Draggable = true });
-    }
+        public async Task OnClick(Survey survey)
+        {
+            Console.WriteLine(survey.ToString());
+            //take id to next page
+            //NavigationManager.NavigateTo($"/responsePage/{surveyId}");
+            await DialogService.OpenAsync<ResultDatePage>($"Name {survey.name}",
+                   new Dictionary<string, object>() { { "survey", survey } },
+                   new DialogOptions() { Width = "100%", Height = "100%", Resizable = true, Draggable = true });
+        }
 
     protected async override void OnInitialized()
     {
@@ -108,12 +110,19 @@
 
         try
         {
-            var resp = await Http.GetFromJsonAsync<int>($"/surveys/{OrganizerID}");
-            Console.WriteLine(resp);
-        } catch (Exception ex)
+            //Console.WriteLine("getting id");
+            int respUser = await Http.GetFromJsonAsync<int>($"/id/{OrganizerID}");
+            //Console.WriteLine("got id");
+
+
+            //Console.WriteLine("getting surveys");
+            surveys = await Http.GetFromJsonAsync<List<Survey>>($"/surveys/{respUser}");
+            //Console.WriteLine("got sruveys");
+            //Console.WriteLine(resp);
+        }
+        catch (Exception ex)
         {
-            var resp = ex.Message + "\n" + ex.StackTrace;
-            Console.WriteLine(resp);
+            Console.WriteLine(ex.Message + "\n" + ex.StackTrace);
         }
 
     }

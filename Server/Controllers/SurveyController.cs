@@ -38,7 +38,7 @@ namespace schedulesUnitedHosted.Server.Controllers
                     {
                         int accountID = Int32.Parse(reader["accountID"].ToString());
                         DateTime availableDay = DateTime.Parse(reader["availableDay"].ToString());
-                        int availableHour = Int32.Parse(reader["availableHour"].ToString());
+                        int availableHour = Int32.Parse(reader["availableTimes"].ToString());
 
                         ret.Add(new Response(accountID, eventID, availableDay, availableHour));
                         i++;
@@ -75,7 +75,7 @@ namespace schedulesUnitedHosted.Server.Controllers
                     {
                         int accountID = Int32.Parse(reader["accountID"].ToString());
                         DateTime availableDay = DateTime.Parse(reader["availableDay"].ToString());
-                        int availableHour = Int32.Parse(reader["availableHour"].ToString());
+                        int availableHour = Int32.Parse(reader["availableTimes"].ToString());
 
                         ret.Add(new Response(accountID, eventID, availableDay, availableHour));
                         i++;
@@ -90,7 +90,7 @@ namespace schedulesUnitedHosted.Server.Controllers
          * <param name="userID">The ID of the User whos Surveys are being requested</param>
          * <returns>All surveys owned by the User</returns>
          */
-        [HttpGet("/surveys/{userID:int}")]
+        [HttpGet("surveys/{userID:int}")]
         [Produces("application/json")]
         public List<Survey> getAllSurvey(int userID)
         {
@@ -216,7 +216,7 @@ namespace schedulesUnitedHosted.Server.Controllers
                     while (reader.Read())
                     {
                         DateTime availableDay = DateTime.Parse(reader["availableDay"].ToString());
-                        int availableHour = Int32.Parse(reader["availableHour"].ToString());
+                        int availableHour = Int32.Parse(reader["availableTimes"].ToString());
 
                         ret.Add(new Response(accountID, surveyID, availableDay, availableHour));
                         i++;
@@ -359,6 +359,7 @@ namespace schedulesUnitedHosted.Server.Controllers
          * <param name="create">The Response to be created, provided in the body of the POST, need all fields, if Hour is not wanted use 0 as a placeholder</param>
          */
         [HttpPost("respond")]
+        [Consumes("application/json")]
         public void createResponse([FromBody] Response create)
         {
             string conString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
@@ -369,7 +370,7 @@ namespace schedulesUnitedHosted.Server.Controllers
                 con.Open();
                 //Create survey
                 //throw new Exception($"INSERT INTO Availabilities VALUES ({create.AccId}, {create.EventId}, '{create.Availability.ToString("yyyy-MM-dd")}', {create.Hour})");
-                MySqlCommand createSurvey = new MySqlCommand($"INSERT INTO Availabilities VALUES ({create.AccId}, {create.EventId}, '{create.Availability.ToString("yyyy-MM-dd")}', {create.Hour})", con);
+                MySqlCommand createSurvey = new MySqlCommand($"INSERT INTO Availabilities VALUES (0, {create.AccId}, {create.EventId}, '{create.Availability.ToString("yyyy-MM-dd")}', {create.Hour})", con);
                 createSurvey.ExecuteNonQuery();
                 con.Close();
             }
@@ -381,6 +382,7 @@ namespace schedulesUnitedHosted.Server.Controllers
          * <param name="delete">The response to be deleted, provided in the body of the POST</param>
          */
         [HttpPost("delete")]
+        [Consumes("application/json")]
         public void deleteResponse([FromBody] Response delete)
         {
             string conString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
@@ -391,7 +393,7 @@ namespace schedulesUnitedHosted.Server.Controllers
                 con.Open();
                 //Create survey
                 //throw new Exception($"DELETE FROM Availabilities WHERE accountID = {delete.AccId} AND eventID = {delete.EventId} AND availableDay = '{delete.Availability.ToString("yyyy-MM-dd")}' AND availableHour = {delete.Hour}");
-                MySqlCommand deleteSurvey = new MySqlCommand($"DELETE FROM Availabilities WHERE accountID = {delete.AccId} AND eventID = {delete.EventId} AND availableDay = '{delete.Availability.ToString("yyyy-MM-dd")}' AND availableHour = {delete.Hour}", con);
+                MySqlCommand deleteSurvey = new MySqlCommand($"DELETE FROM Availabilities WHERE accountID = {delete.AccId} AND eventID = {delete.EventId} AND availableDay = '{delete.Availability.ToString("yyyy-MM-dd")}' AND availableTimes = {delete.Hour}", con);
                 deleteSurvey.ExecuteNonQuery();
                 con.Close();
             }
@@ -402,29 +404,32 @@ namespace schedulesUnitedHosted.Server.Controllers
          * <param name="create">The survey that is to be created, provided in the body of the POST. The Survey ID field is not required, and should be requested once the survey is created. Additionally, if responses are present they will be added to the survey</param>
          */
         [HttpPost("create")]
+        [Consumes("application/json")]
         public void CreateSurvey([FromBody] Survey create)
         {
-            string conString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
-            DBCon conGen = new DBCon(conString);
-            MySqlConnection con = conGen.GetConnection();
-            using (con)
-            {
-                con.Open();
-                //Create survey
-                MySqlCommand createSurvey = new MySqlCommand($"INSERT INTO CalendarEvents VALUES (NULL, '{create.name}', '{create.start.ToString("yyyy-MM-dd")}', '{create.end.ToString("yyyy-MM-dd")}', {create.host})", con);
-                createSurvey.ExecuteNonQuery();
-                con.Close();
-            }
-            if (create.Responses.Count > 0)
-            {
-                int id = getSurveyID(create.name, create.host);
-                for(int i = 0; i < create.Responses.Count; i++)
+            
+                string conString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
+                DBCon conGen = new DBCon(conString);
+                MySqlConnection con = conGen.GetConnection();
+                using (con)
                 {
-                    Response temp = create.Responses[i];
-                    temp.EventId = id;
-                    createResponse(create.Responses[i]);
+                    con.Open();
+                    //Create survey
+                    MySqlCommand createSurvey = new MySqlCommand($"INSERT INTO CalendarEvents VALUES (NULL, '{create.name}', '{create.start.ToString("yyyy-MM-dd")}', '{create.end.ToString("yyyy-MM-dd")}', {create.host})", con);
+                    createSurvey.ExecuteNonQuery();
+                    con.Close();
                 }
-            }
+                if (create.Responses.Count > 0)
+                {
+                    int id = getSurveyID(create.name, create.host);
+                    for (int i = 0; i < create.Responses.Count; i++)
+                    {
+                        Response temp = create.Responses[i];
+                        temp.EventId = id;
+                        createResponse(create.Responses[i]);
+                    }
+                }
+           
         }
 
         // POST <SurveyController>/edit
@@ -432,6 +437,7 @@ namespace schedulesUnitedHosted.Server.Controllers
          * <param name="combined">The UserSurvey object that holds both the Survey and its Owning User, provided in the body of the POST. Only works if the provided user is the owner of the Survey</param>
          */
         [HttpPost("edit")]
+        [Consumes("application/json")]
         public void EditSurvey([FromBody] UserSurvey combined)
         {
             User owner = combined.user;
@@ -459,6 +465,7 @@ namespace schedulesUnitedHosted.Server.Controllers
          * <exception cref="Exception">Throws an exception if the User is not the owner of the Survey, or if the survey doesn't exist</exception>
          */
         [HttpPost("delete/{id:int}")]
+        [Consumes("application/json")]
         public void DeleteSurvey(int id, [FromBody] User owner)
         {
             User cleaned = DBCon.Clean(owner);
@@ -498,6 +505,7 @@ namespace schedulesUnitedHosted.Server.Controllers
          * <param name="id">The id of the user being invited, to be included in the URL</param>
          */
         [HttpPost("invite/{id:int}")]
+        [Consumes("application/json")]
         public void inviteUser(int id, [FromBody] int survey)
         {
             string conString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");

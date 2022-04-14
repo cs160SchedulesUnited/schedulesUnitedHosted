@@ -1,5 +1,6 @@
 ﻿@page "/resultDate/{survey}"
 @using Radzen.Blazor
+@inject HttpClient Http;
 @using schedulesUnitedHosted.Shared;
 
 
@@ -7,7 +8,7 @@
 
 <h3>Component1</h3>
 
-<RadzenScheduler Data="@appointments" Style="height: 700px; padding-bottom: 30px;" TItem="Appointment"  AppointmentRender=@OnAppointmentRender StartProperty="Start" AppointmentSelect=@OnAppointmentSelect EndProperty="End" TextProperty="Text">
+<RadzenScheduler Data="@appointments" Context="" Style="height: 700px; padding-bottom: 30px;" TItem="Response" TextProperty="text" AppointmentRender=@OnAppointmentRender StartProperty="Availability" AppointmentSelect=@OnAppointmentSelect EndProperty="Availability">
     <RadzenMonthView />
 </RadzenScheduler>
 <div style="width: 100%;">
@@ -22,7 +23,6 @@
 </div>
 
 @code {
-
     [Parameter] public Survey survey { get; set; }
 
     class Appointment
@@ -32,7 +32,9 @@
         public string Text { get; set; }
     }
 
-    IList<Appointment> appointments = new List<Appointment>
+    IList<Response> appointments = new List<Response>();
+
+    IList<Appointment> appointmentss = new List<Appointment>
 {
         new Appointment { Start = DateTime.Today.AddDays(-2), End = DateTime.Today.AddDays(-2), Text = "Birthday" },
         new Appointment { Start = DateTime.Today.AddDays(-11), End = DateTime.Today.AddDays(-10), Text = "Day off" },
@@ -46,37 +48,63 @@
     IEnumerable<string> notRespondedList = new List<string> { "Person 4", "Person 5", "Person 6", };
     IEnumerable<string> respondedList = new List<string> { "Person 1", "Person 2", "Person 3" };
 
-    void OnAppointmentRender(SchedulerAppointmentRenderEventArgs<Appointment> args)
+    void OnAppointmentRender(SchedulerAppointmentRenderEventArgs<Response> args)
     {
+
         args.Attributes["style"] = "background: rgba(201, 76, 76, 0.3)";
 
     }
 
 
-    protected override void OnInitialized()
+    async protected override void OnInitialized()
     {
-        Console.WriteLine(survey.ToString());
+        try
+        {
+            //Console.WriteLine("getting id");
+            appointments = await Http.GetFromJsonAsync<List<Response>>($"/responses/{survey.id}");
+
+            // calc best days
+
+
+
+
+
+
+
+
+        }
+        catch (Exception ex)
+        {
+
+            Console.WriteLine(ex.Message + "\n" + ex.StackTrace);
+        }
+
     }
 
-    async Task OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<Appointment> args)
+    async Task OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<Response> args)
     {
-        Appointment app = appointments.Where(p => p.Start.Equals(args.Start) && p.End.Equals(args.End) && p.Start.Equals(args.Start)).FirstOrDefault();
 
-        //get ppl who responded and show:
-        await ShowAppInfo(app);
+        var responses = await Http.GetFromJsonAsync<List<Response>>($"/responses/{survey.id}/{args.Start.ToString("yyyy-MM-dd")}");
+        IList<string> names = new List<string>();
 
-    }
+        foreach (Response response in responses)
+        {
+            //get names of user from id of each
 
-    async Task ShowAppInfo(Appointment app)
-    {
-        IEnumerable<string> respondedApp = new List<string> { "Person 1", "Person 2", "Person 3" };
+
+            //for now
+            names.Add(response.AccId.ToString());
+        }
+
         var result = await DialogService.OpenAsync("Simple Dialog", ds =>
-    @<div>
-         <RadzenCard Style=" width: 50%; height: 100%;">
-             <p>Responded</p>
-             <RadzenListBox Data=@respondedApp TValue="string" Style="max-height: 100px;" />
-         </RadzenCard>
-    </div>);
+            @<div>
+                <RadzenCard Style=" width: 50%; height: 100%;">
+                    <p>Responded</p>
+                    <RadzenListBox TValue="string" Data=@names Style="max-height: 100px;" />
+                </RadzenCard>
+            </div>);
 
 }
+
+
 }

@@ -44,6 +44,34 @@ namespace schedulesUnitedHosted.Server.Controllers
             return ret;
         }
 
+        // This API should not be used for validation
+        // GET <UserController>/{userID}
+        /**
+         * <param name="userID">The userID of the desired user information is to be included in the URL</param>
+         * <returns>A User with accountID, personName, userName, and password</returns>
+         */
+        [HttpGet("info/{userID:int}")]
+        [Produces("application/json")]
+        public User getUserInfo(int userID)
+        {
+            string conString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
+            DBCon conGen = new DBCon(conString);
+            MySqlConnection con = conGen.GetConnection();
+            User ret = null;
+            using (con)
+            {
+                con.Open();
+                MySqlCommand test = new MySqlCommand($"SELECT * FROM Accounts WHERE accountID = '{userID}'", con);
+                using (var reader = test.ExecuteReader())
+                    while (reader.Read())
+                    {
+                        ret = new User(Int32.Parse(reader["accountID"].ToString()), reader["personName"].ToString(), reader["username"].ToString(), reader["accountPassword"].ToString());
+                    }
+                con.Close();
+            }
+            return ret;
+        }
+
         // If this returns 0, the user was not found
         // GET <UserController>/id/{username}
         /**
@@ -78,7 +106,8 @@ namespace schedulesUnitedHosted.Server.Controllers
         /**
          * <param name="person">Takes a User object as input from the body of the POST, userID is not needed in the provided User, once you create the user, you must call getUserId in order to get the correct UserId</param>
          */
-        [HttpPost("/create")]
+        [HttpPost("create")]
+        [Consumes("application/json")]
         public void createUser([FromBody] User person)
         {
             User cleaned = DBCon.Clean(person);
@@ -119,7 +148,8 @@ namespace schedulesUnitedHosted.Server.Controllers
          * <param name="person">Requires User from body of POST, User object must exactly match the existing user or it throws an error</param>
          * <exception cref="Exception">If the user fails to validate, an exception is thrown</exception>
          */
-        [HttpPost("/delete")]
+        [HttpPost("delete")]
+        [Consumes("application/json")]
         public void deleteUser([FromBody] User person)
         {
             User cleaned = DBCon.Clean(person);
@@ -132,7 +162,7 @@ namespace schedulesUnitedHosted.Server.Controllers
                 con.Open();
                 try
                 {
-                    Validate(person);
+                    if(Validate(person) == false) throw new Exception("Username and/or Password incorrect");
                     MySqlCommand delete = new MySqlCommand($"DELETE FROM Accounts WHERE username = '{person.username}'", con);
                     delete.ExecuteNonQuery();
                 }
@@ -153,15 +183,18 @@ namespace schedulesUnitedHosted.Server.Controllers
          * <exception cref="Exception">If the user fails to validate, an exception is thrown</exception>
          * <returns>Nothing with no errors if the user succesfully validates, might not be the best option</returns>
          */
-        [HttpPost("/validate")]
+        [HttpPost("validate")]
+        [Consumes("application/json")]
         public Boolean Validate([FromBody] User person)
         {
             Utilities util = new Utilities();
             User cleaned = DBCon.Clean(person);
             User ret = null;
+
             string conString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
             DBCon conGen = new DBCon(conString);
             MySqlConnection con = conGen.GetConnection();
+
             using (con)
             {
                 con.Open();
@@ -178,7 +211,7 @@ namespace schedulesUnitedHosted.Server.Controllers
                 if (ret == null)
                 {
                     // Credentials incorrect, throw an error
-                    throw new Exception("Username and/or Password incorrect");
+                    //throw new Exception("Username and/or Password incorrect");
                     return false;
                 }
                 else if(ret.password.Equals(password))
@@ -189,7 +222,7 @@ namespace schedulesUnitedHosted.Server.Controllers
                 else
                 {
                     // Credentials incorrect, throw an error
-                    throw new Exception("Username and/or Password incorrect");
+                    //throw new Exception("Username and/or Password incorrect");
                     return false;
                 }
                 con.Close();

@@ -82,8 +82,8 @@
 
     async void Submit()
     {
-        survey.host = int.Parse(OrganizerID);
-
+        //survey.host = int.Parse(OrganizerID);
+        survey.host = await Http.GetFromJsonAsync<int>($"/id/{OrganizerID}");
         Console.WriteLine(survey.ToString());
 
 
@@ -92,9 +92,8 @@
 
         try
         {
-            //should be post
-            //var resp = await Http.PostAsJsonAsync<schedulesUnitedHosted.Shared.Survey>("create", survey);
-            Console.WriteLine(resp);
+            var resp = await Http.PostAsJsonAsync<schedulesUnitedHosted.Shared.Survey>("create", survey);
+            //Console.WriteLine(resp);
 
 
 
@@ -107,7 +106,7 @@
 
                 //should be post
                 //var respInvite = await Http.PostAsJsonAsync<int>("invite/{id:int}", survey.id, int.Parse(inviteeID));
-                Console.WriteLine(respInvite);
+                //Console.WriteLine(respInvite);
             }
 
 
