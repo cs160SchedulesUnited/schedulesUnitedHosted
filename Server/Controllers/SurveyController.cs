@@ -18,7 +18,7 @@ namespace schedulesUnitedHosted.Server.Controllers
          * <param name="eventID">The ID of the event for which responses should be fetched, provide this in the URL</param>
          * <returns>A List of all responses to the survey</returns>
          */
-        [HttpGet("/responses/{eventID:int}")]
+        [HttpGet("responses/{eventID:int}")]
         [Produces("application/json")]
         public List<Response> getAllResponses(int eventID)
         {
@@ -54,7 +54,7 @@ namespace schedulesUnitedHosted.Server.Controllers
          * <param name="date">The date as a string for which responses are being requested, provide this in the URL in the form: yyyy-MM-dd</param>
          * <returns>All responses to the survey on the given date</returns>
          */
-        [HttpGet("/responses/{eventID:int}/{date}")]
+        [HttpGet("responses/{eventID:int}/{date}")]
         [Produces("application/json")]
         public List<Response> getDayResponses(int eventID, string date)
         {

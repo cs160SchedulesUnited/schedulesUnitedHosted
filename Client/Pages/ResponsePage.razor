@@ -1,8 +1,8 @@
-﻿@page "/responsePage/{survey}"
+﻿@page "/responsePage/{partID}/{survey}"
 @using Radzen.Blazor
 @using System.Linq;
 @using schedulesUnitedHosted.Shared;
-
+@inject HttpClient Http;
 @inject Radzen.DialogService dialogService;
 
 
@@ -10,17 +10,19 @@
 
 <RadzenCard Style="margin: 0px; height: 90vh;">
 
-    <RadzenScheduler Data="@appointments" @ref=@scheduler Style="height: 90%; width: 100%; margin: 0px;" TItem="Appointment" StartProperty="Start" SlotSelect=@OnSlotSelect AppointmentSelect=@OnAppointmentSelect EndProperty="End" TextProperty="Text">
+    <RadzenScheduler Data="@appointments" @ref=@scheduler Style="height: 200px; width: 100%; margin: 0px;" TItem="Appointment" StartProperty="Start" SlotSelect=@OnSlotSelect AppointmentSelect=@OnAppointmentSelect EndProperty="End" TextProperty="Text">
         <RadzenMonthView />
     </RadzenScheduler>
+    <RadzenButton Click=OnClick Text="Submit" Icon="check_circle" ButtonStyle="ButtonStyle.Success" />
 
-   
+
 </RadzenCard>
 
 
 @code {
 
-    [Parameter] public Survey survey { get; set; }
+    [Parameter] public int survey { get; set; }
+    [Parameter] public string partID { get; set; }
 
     RadzenScheduler<Appointment> scheduler;
 
@@ -35,25 +37,34 @@
 
     protected override void OnInitialized()
     {
-        appointments = new List<Appointment>
-{
-        new Appointment { Start = DateTime.Today.AddDays(-2), End = DateTime.Today.AddDays(-2), Text = "Birthday" },
-        new Appointment { Start = DateTime.Today.AddDays(-11), End = DateTime.Today.AddDays(-10), Text = "Day off" },
-        new Appointment { Start = DateTime.Today.AddDays(-10), End = DateTime.Today.AddDays(-8), Text = "Work from home" },
-        new Appointment { Start = DateTime.Today.AddHours(10), End = DateTime.Today.AddHours(12), Text = "Online meeting" },
-        new Appointment { Start = DateTime.Today.AddHours(10), End = DateTime.Today.AddHours(13), Text = "Skype call" },
-        new Appointment { Start = DateTime.Today.AddHours(14), End = DateTime.Today.AddHours(14).AddMinutes(30), Text = "Dentist appointment" },
-        new Appointment { Start = DateTime.Today.AddDays(1), End = DateTime.Today.AddDays(12), Text = "Vacation" },
-        };
+        Console.WriteLine($"{partID} + {survey}");
     }
 
+    public async Task OnClick()
+    {
+
+        foreach (Appointment appointment in appointments)
+        {
+
+            try
+            {
+                @*Response r = new Response(partID, );
+                var respUser = await Http.PostFromJsonAsync<Response>($"respond");*@
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+
+    }
 
     async Task OnSlotSelect(SchedulerSlotSelectEventArgs args)
     {
-        
+
         appointments.Add(new Appointment { Start = args.Start, End = args.End, Text = "Busy" });
         await scheduler.Reload();
-    
+
     }
 
 

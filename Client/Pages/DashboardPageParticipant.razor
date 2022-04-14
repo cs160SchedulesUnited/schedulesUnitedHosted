@@ -3,6 +3,7 @@
 @using schedulesUnitedHosted.Shared;
 @inject DialogService DialogService;
 @implements IDisposable;
+@inject HttpClient Http;
 @inject NavigationManager NavigationManager;
 
 <h3>Organizer Dashboard</h3>
@@ -36,7 +37,7 @@
                             </div>
                         </div>
                         <div class="col-lg-2 p-3">
-                            <RadzenButton Text="check if person responded then See response else Respond" Click="@(args => OnClick(survey))" Class="w-100" />
+                            <RadzenButton Text="Respond" Click="@(args => OnClick(survey))" Class="w-100" />
                         </div>
                     </div>
                 </div>
@@ -67,6 +68,7 @@
 
 @code {
 
+
     [Parameter]
     public string ParticipantID { get; set; }
 
@@ -86,15 +88,33 @@
         //take id to next page
         //NavigationManager.NavigateTo($"/responsePage/{surveyId}");
         await DialogService.OpenAsync<ResponsePage>($"Name {survey.name}",
-               new Dictionary<string, object>() { { "survey", survey } },
+               new Dictionary<string, object>() { { "survey", survey.id }, {"partID", ParticipantID } },
                new DialogOptions() { Width = "100%", Height = "100%", Resizable = true, Draggable = true });
     }
 
-    protected override void OnInitialized()
+    async protected override void OnInitialized()
     {
         //function to get surveys
         DialogService.OnOpen += Open;
         DialogService.OnClose += Close;
+
+
+        try
+        {
+            Console.WriteLine("getting id");
+            int respUser = await Http.GetFromJsonAsync<int>($"user/id/{ParticipantID}");
+            Console.WriteLine("got id");
+
+
+            Console.WriteLine("getting surveys");
+            surveys = await Http.GetFromJsonAsync<List<Survey>>($"survey/invited/nonresponded/{respUser}");
+            Console.WriteLine("got sruveys");
+            //Console.WriteLine(resp);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message + "\n" + ex.StackTrace);
+        }
     }
 
 

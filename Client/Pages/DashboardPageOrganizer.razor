@@ -110,14 +110,14 @@
 
         try
         {
-            //Console.WriteLine("getting id");
-            int respUser = await Http.GetFromJsonAsync<int>($"/id/{OrganizerID}");
-            //Console.WriteLine("got id");
+            Console.WriteLine("getting id");
+            int respUser = await Http.GetFromJsonAsync<int>($"user/id/{OrganizerID}");
+            Console.WriteLine("got id");
 
 
-            //Console.WriteLine("getting surveys");
-            surveys = await Http.GetFromJsonAsync<List<Survey>>($"/surveys/{respUser}");
-            //Console.WriteLine("got sruveys");
+            Console.WriteLine("getting surveys");
+            surveys = await Http.GetFromJsonAsync<List<Survey>>($"survey/surveys/{respUser}");
+            Console.WriteLine("got sruveys");
             //Console.WriteLine(resp);
         }
         catch (Exception ex)
