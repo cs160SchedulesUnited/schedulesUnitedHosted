@@ -92,7 +92,7 @@
 
         try
         {
-            var resp = await Http.PostAsJsonAsync<schedulesUnitedHosted.Shared.Survey>("/create", survey);
+            var resp = await Http.PostAsJsonAsync<schedulesUnitedHosted.Shared.Survey>("create", survey);
             //Console.WriteLine(resp);
 
 
