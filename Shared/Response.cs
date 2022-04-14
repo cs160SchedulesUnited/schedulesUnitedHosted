@@ -6,6 +6,7 @@ namespace schedulesUnitedHosted.Shared
 {
     public class Response
     {
+        public string text = "";
         public int AccId { get; set; }
 
         public int EventId { get; set; }
