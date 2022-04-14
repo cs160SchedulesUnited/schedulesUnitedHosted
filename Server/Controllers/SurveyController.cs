@@ -90,7 +90,7 @@ namespace schedulesUnitedHosted.Server.Controllers
          * <param name="userID">The ID of the User whos Surveys are being requested</param>
          * <returns>All surveys owned by the User</returns>
          */
-        [HttpGet("/surveys/{userID:int}")]
+        [HttpGet("surveys/{userID:int}")]
         [Produces("application/json")]
         public List<Survey> getAllSurvey(int userID)
         {
