@@ -181,6 +181,22 @@ namespace schedulesUnitedHosted.Tests
             Assert.Equal(0, id);
         }
 
+        [Fact]
+        public void getInvitedUsersExists()
+        {
+            var controller = new SurveyController();
+            var ids = controller.getInvitedUsers(1);
+            Assert.Equal(2, ids[0]);
+        }
+
+        [Fact]
+        public void getInvitedUsersNonexistent()
+        {
+            var controller = new SurveyController();
+            var ids = controller.getInvitedUsers(-1);
+            Assert.Empty(ids);
+        }
+
         public List<Response> getTestResponses()
         {
             List<Response> testResponses = new List<Response>();

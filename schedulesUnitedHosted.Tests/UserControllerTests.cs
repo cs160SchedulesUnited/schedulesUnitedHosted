@@ -10,6 +10,14 @@ namespace schedulesUnitedHosted.Tests
     public class UserControllerTests
     {
         [Fact]
+        public void DBConnectionTest()
+        {
+            var controller = new DBController();
+            string test = controller.Get();
+            Assert.Equal("Connection Successful", test);
+        }
+
+        [Fact]
         public void getUserInfoExists()
         {
             var controller = new UserController();
@@ -19,19 +27,29 @@ namespace schedulesUnitedHosted.Tests
         }
 
         [Fact]
-        public void DBConnectionTest()
-        {
-            var controller = new DBController();
-            string test = controller.Get();
-            Assert.Equal("Connection Successful", test);
-        }
-
-        [Fact]
         public void getUserInfoNonexistent()
         {
             var controller = new UserController();
             var testUsers = getTestUsers();
             User test = controller.getUserInfo(testUsers[4].username);
+            Assert.Null(test);
+        }
+
+        [Fact]
+        public void getUserInfoExistsID()
+        {
+            var controller = new UserController();
+            var testUsers = getTestUsers();
+            User test = controller.getUserInfo(testUsers[0].accountID);
+            Assert.Equal(test.toString(), testUsers[0].toString());
+        }
+
+        [Fact]
+        public void getUserInfoNonexistentID()
+        {
+            var controller = new UserController();
+            var testUsers = getTestUsers();
+            User test = controller.getUserInfo(testUsers[4].accountID);
             Assert.Null(test);
         }
 
@@ -178,7 +196,7 @@ namespace schedulesUnitedHosted.Tests
             testUsers.Add(new User("cre", "cre", "bob"));
             testUsers.Add(new User("del", "del", "del"));
             // should never be added, to be used as a non-existent user
-            testUsers.Add(new User("sarah", "sar", "s123"));
+            testUsers.Add(new User(-1, "sarah", "sar", "s123"));
             return testUsers;
         }
     }
