@@ -44,6 +44,34 @@ namespace schedulesUnitedHosted.Server.Controllers
             return ret;
         }
 
+        // This API should not be used for validation
+        // GET <UserController>/{userID}
+        /**
+         * <param name="userID">The userID of the desired user information is to be included in the URL</param>
+         * <returns>A User with accountID, personName, userName, and password</returns>
+         */
+        [HttpGet("/info/{userID:int}")]
+        [Produces("application/json")]
+        public User getUserInfo(int userID)
+        {
+            string conString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
+            DBCon conGen = new DBCon(conString);
+            MySqlConnection con = conGen.GetConnection();
+            User ret = null;
+            using (con)
+            {
+                con.Open();
+                MySqlCommand test = new MySqlCommand($"SELECT * FROM Accounts WHERE accountID = '{userID}'", con);
+                using (var reader = test.ExecuteReader())
+                    while (reader.Read())
+                    {
+                        ret = new User(Int32.Parse(reader["accountID"].ToString()), reader["personName"].ToString(), reader["username"].ToString(), reader["accountPassword"].ToString());
+                    }
+                con.Close();
+            }
+            return ret;
+        }
+
         // If this returns 0, the user was not found
         // GET <UserController>/id/{username}
         /**
@@ -79,7 +107,7 @@ namespace schedulesUnitedHosted.Server.Controllers
          * <param name="person">Takes a User object as input from the body of the POST, userID is not needed in the provided User, once you create the user, you must call getUserId in order to get the correct UserId</param>
          */
         [HttpPost("/create")]
-        public bool createUser([FromBody] User person)
+        public void createUser([FromBody] User person)
         {
             User cleaned = DBCon.Clean(person);
             User ret = null;
@@ -104,13 +132,11 @@ namespace schedulesUnitedHosted.Server.Controllers
                     //Create user
                     MySqlCommand createUser = new MySqlCommand($"INSERT INTO Accounts (personName, username, accountPassword) VALUES ('{name}', '{username}', '{password}')", con);
                     createUser.ExecuteNonQuery();
-                    return true;
                 }
                 else
                 {
                     //Do nothing, return error, user already exists
-                    //throw new Exception("User already exists");
-                    return false;
+                    throw new Exception("User already exists");
                 }
                 con.Close();
             }
