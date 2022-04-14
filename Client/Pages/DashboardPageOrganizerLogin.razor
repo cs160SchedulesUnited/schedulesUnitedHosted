@@ -96,7 +96,7 @@
         try
         {
             schedulesUnitedHosted.Shared.User toAdd = new schedulesUnitedHosted.Shared.User(user.Name, user.Username, user.Password);
-            var resp = await Http.PostAsJsonAsync<schedulesUnitedHosted.Shared.User>("/create", toAdd);
+            var resp = await Http.PostAsJsonAsync<schedulesUnitedHosted.Shared.User>("user/create", toAdd);
             var res = await resp.Content.ReadFromJsonAsync<bool>();
 
             if (res == false)

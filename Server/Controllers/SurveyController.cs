@@ -18,7 +18,7 @@ namespace schedulesUnitedHosted.Server.Controllers
          * <param name="eventID">The ID of the event for which responses should be fetched, provide this in the URL</param>
          * <returns>A List of all responses to the survey</returns>
          */
-        [HttpGet("/responses/{eventID:int}")]
+        [HttpGet("responses/{eventID:int}")]
         [Produces("application/json")]
         public List<Response> getAllResponses(int eventID)
         {
@@ -54,7 +54,7 @@ namespace schedulesUnitedHosted.Server.Controllers
          * <param name="date">The date as a string for which responses are being requested, provide this in the URL in the form: yyyy-MM-dd</param>
          * <returns>All responses to the survey on the given date</returns>
          */
-        [HttpGet("/responses/{eventID:int}/{date}")]
+        [HttpGet("responses/{eventID:int}/{date}")]
         [Produces("application/json")]
         public List<Response> getDayResponses(int eventID, string date)
         {
@@ -90,7 +90,7 @@ namespace schedulesUnitedHosted.Server.Controllers
          * <param name="userID">The ID of the User whos Surveys are being requested</param>
          * <returns>All surveys owned by the User</returns>
          */
-        [HttpGet("/surveys/{userID:int}")]
+        [HttpGet("surveys/{userID:int}")]
         [Produces("application/json")]
         public List<Survey> getAllSurvey(int userID)
         {
@@ -359,6 +359,7 @@ namespace schedulesUnitedHosted.Server.Controllers
          * <param name="create">The Response to be created, provided in the body of the POST, need all fields, if Hour is not wanted use 0 as a placeholder</param>
          */
         [HttpPost("respond")]
+        [Consumes("application/json")]
         public void createResponse([FromBody] Response create)
         {
             string conString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
@@ -381,6 +382,7 @@ namespace schedulesUnitedHosted.Server.Controllers
          * <param name="delete">The response to be deleted, provided in the body of the POST</param>
          */
         [HttpPost("delete")]
+        [Consumes("application/json")]
         public void deleteResponse([FromBody] Response delete)
         {
             string conString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
@@ -401,7 +403,8 @@ namespace schedulesUnitedHosted.Server.Controllers
         /**
          * <param name="create">The survey that is to be created, provided in the body of the POST. The Survey ID field is not required, and should be requested once the survey is created. Additionally, if responses are present they will be added to the survey</param>
          */
-        [HttpPost("/create")]
+        [HttpPost("create")]
+        [Consumes("application/json")]
         public void CreateSurvey([FromBody] Survey create)
         {
             
@@ -434,6 +437,7 @@ namespace schedulesUnitedHosted.Server.Controllers
          * <param name="combined">The UserSurvey object that holds both the Survey and its Owning User, provided in the body of the POST. Only works if the provided user is the owner of the Survey</param>
          */
         [HttpPost("edit")]
+        [Consumes("application/json")]
         public void EditSurvey([FromBody] UserSurvey combined)
         {
             User owner = combined.user;
@@ -461,6 +465,7 @@ namespace schedulesUnitedHosted.Server.Controllers
          * <exception cref="Exception">Throws an exception if the User is not the owner of the Survey, or if the survey doesn't exist</exception>
          */
         [HttpPost("delete/{id:int}")]
+        [Consumes("application/json")]
         public void DeleteSurvey(int id, [FromBody] User owner)
         {
             User cleaned = DBCon.Clean(owner);
@@ -500,6 +505,7 @@ namespace schedulesUnitedHosted.Server.Controllers
          * <param name="id">The id of the user being invited, to be included in the URL</param>
          */
         [HttpPost("invite/{id:int}")]
+        [Consumes("application/json")]
         public void inviteUser(int id, [FromBody] int survey)
         {
             string conString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");

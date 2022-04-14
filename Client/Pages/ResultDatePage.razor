@@ -8,7 +8,7 @@
 
 <h3>Component1</h3>
 
-<RadzenScheduler Data="@appointments" Context="" Style="height: 700px; padding-bottom: 30px;" TItem="Response" TextProperty="text" AppointmentRender=@OnAppointmentRender StartProperty="Availability" AppointmentSelect=@OnAppointmentSelect EndProperty="Availability">
+<RadzenScheduler Data="@appointmentss" Style="height: 700px; padding-bottom: 30px;" TItem="Appointment" TextProperty="Text" AppointmentRender=@OnAppointmentRender StartProperty="Start" AppointmentSelect=@OnAppointmentSelect EndProperty="End">
     <RadzenMonthView />
 </RadzenScheduler>
 <div style="width: 100%;">
@@ -48,7 +48,7 @@
     IEnumerable<string> notRespondedList = new List<string> { "Person 4", "Person 5", "Person 6", };
     IEnumerable<string> respondedList = new List<string> { "Person 1", "Person 2", "Person 3" };
 
-    void OnAppointmentRender(SchedulerAppointmentRenderEventArgs<Response> args)
+    void OnAppointmentRender(SchedulerAppointmentRenderEventArgs<Appointment> args)
     {
 
         args.Attributes["style"] = "background: rgba(201, 76, 76, 0.3)";
@@ -61,12 +61,19 @@
         try
         {
             //Console.WriteLine("getting id");
-            appointments = await Http.GetFromJsonAsync<List<Response>>($"/responses/{survey.id}");
-
+            appointments = await Http.GetFromJsonAsync<List<Response>>($"survey/responses/{survey.id}");
+            IList<Appointment> responses = new List<Appointment>();
             // calc best days
 
+            var query = appointments.GroupBy(x => x.Availability.ToString("yyyy-MM-dd"))
+            .Select(group => new { Location = group.Key, Count = group.Count() })
+            .OrderByDescending(x => x.Count);
 
 
+
+
+
+            Console.WriteLine(query);
 
 
 
@@ -81,10 +88,10 @@
 
     }
 
-    async Task OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<Response> args)
+    async Task OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<Appointment> args)
     {
 
-        var responses = await Http.GetFromJsonAsync<List<Response>>($"/responses/{survey.id}/{args.Start.ToString("yyyy-MM-dd")}");
+        var responses = await Http.GetFromJsonAsync<List<Response>>($"survey/responses/{survey.id}/{args.Start.ToString("yyyy-MM-dd")}");
         IList<string> names = new List<string>();
 
         foreach (Response response in responses)
