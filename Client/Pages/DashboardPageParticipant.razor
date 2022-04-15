@@ -136,9 +136,21 @@
             int respUser = await Http.GetFromJsonAsync<int>($"user/id/{ParticipantID}");
 
 
-            surveys = await Http.GetFromJsonAsync<List<Survey>>($"survey/invited/nonresponded/{respUser}");
+            var notRespSurveys = await Http.GetFromJsonAsync<List<int>>($"survey/invited/nonresponded/{respUser}");
 
-            surveysResp = await Http.GetFromJsonAsync<List<Survey>>($"survey/invited/responded/{respUser}");
+            foreach (int notRespSurvey in notRespSurveys)
+            {
+                var sur = await Http.GetFromJsonAsync<Survey>($"survey/{notRespSurvey}");
+                surveys.Add(sur);
+            }
+
+            var respSurveys = await Http.GetFromJsonAsync<List<int>>($"survey/invited/responded/{respUser}");
+
+            foreach (int respSurvey in respSurveys)
+            {
+                var sur = await Http.GetFromJsonAsync<Survey>($"survey/{respSurvey}");
+                surveysResp.Add(sur);
+            }
 
             await dataList.Reload();
             await dataListResp.Reload();
