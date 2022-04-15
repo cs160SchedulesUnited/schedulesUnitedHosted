@@ -61,7 +61,9 @@ namespace schedulesUnitedHosted.Server.Controllers
             using (con)
             {
                 con.Open();
+               
                 MySqlCommand test = new MySqlCommand($"SELECT * FROM Accounts WHERE accountID = '{userID}'", con);
+                
                 using (var reader = test.ExecuteReader())
                     while (reader.Read())
                     {
@@ -101,6 +103,7 @@ namespace schedulesUnitedHosted.Server.Controllers
             }
             return ret;
         }
+
 
         // POST <UserController>
         /**

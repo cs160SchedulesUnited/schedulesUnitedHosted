@@ -1,6 +1,10 @@
-﻿@page "/createSurvey/{organizerID}"
+﻿@page "/createSurvey/{organizerUserName}"
 @using Radzen.Blazor
 @inject HttpClient Http;
+@inject NavigationManager NavigationManager;
+@inject NotificationService NotificationService;
+
+
 @using schedulesUnitedHosted.Shared
 
 <h1>Create Survey for participants</h1>
@@ -72,7 +76,7 @@
 @code {
 
     [Parameter]
-    public string OrganizerID { get; set; }
+    public string OrganizerUserName { get; set; }
 
 
     string value;
@@ -83,41 +87,64 @@
     async void Submit()
     {
         //survey.host = int.Parse(OrganizerID);
-        survey.host = await Http.GetFromJsonAsync<int>($"user/id/{OrganizerID}");
-        Console.WriteLine(survey.ToString());
 
-
-
-        //////////// TEST
-
-        try
+        if (survey.end > survey.start)
         {
-            var resp = await Http.PostAsJsonAsync<schedulesUnitedHosted.Shared.Survey>("survey/create", survey);
-            //Console.WriteLine(resp);
-
-            Console.WriteLine(resp);
 
 
-            ////TEST
-            ///
-            List<string> inviteeIDs = value.Replace(" ", "").Split(',').ToList();
+           
+            survey.host = await Http.GetFromJsonAsync<int>($"user/id/{OrganizerUserName}");
+            Console.WriteLine(survey.ToString());
 
-            foreach (string inviteeID in inviteeIDs)
+
+
+            //////////// TEST
+
+            try
             {
+                var resp = await Http.PostAsJsonAsync<schedulesUnitedHosted.Shared.Survey>("survey/create", survey);
+                //Console.WriteLine(resp);
 
-                //should be post
-                var respInvite = await Http.PostAsJsonAsync<int>($"survey/invite/{inviteeID}", survey.id);
-                Console.WriteLine(respInvite);
+
+                Console.WriteLine(resp);
+
+                survey.id = await Http.GetFromJsonAsync<int>($"survey/{survey.name}/{survey.host}");
+
+
+
+                ////TEST
+                ///
+                List<string> inviteeIDs = value.Replace(" ", "").Split(',').ToList();
+
+                foreach (string inviteeID in inviteeIDs)
+                {
+                    //should be post
+                    Console.WriteLine(inviteeID);
+                    //var exists = await Http.GetFromJsonAsync<User>($"user/info/{inviteeID}");
+                    //Console.WriteLine(exists);
+                    Console.WriteLine("invite");
+                    var respInvite = await Http.PostAsJsonAsync<int>($"survey/invite/{inviteeID}", survey.id);
+                    Console.WriteLine(respInvite);
+                }
+
+                var user = await Http.GetFromJsonAsync<User>($"user/info/{OrganizerUserName}");
+                NavigationManager.NavigateTo($"/organizerDashboard/{user.accountID}");
+
+
             }
-
-
+            catch (Exception ex)
+            {
+                var resp = ex.Message + "\n" + ex.StackTrace;
+                Console.WriteLine(resp);
+            }
         }
-        catch (Exception ex)
+        else
         {
-            var resp = ex.Message + "\n" + ex.StackTrace;
-            Console.WriteLine(resp);
+            var message = new NotificationMessage { Severity = NotificationSeverity.Error, Summary = "Failure", Detail = "End survey date must be after start date", Duration = 4000 };
+            NotificationService.Notify(message);
         }
 
     }
+
 
 }

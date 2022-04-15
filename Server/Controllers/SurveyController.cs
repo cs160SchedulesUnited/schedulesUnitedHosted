@@ -419,7 +419,7 @@ namespace schedulesUnitedHosted.Server.Controllers
                     createSurvey.ExecuteNonQuery();
                     con.Close();
                 }
-                if (create.Responses.Count > 0)
+                if (create.Responses != null && create.Responses.Count > 0)
                 {
                     int id = getSurveyID(create.name, create.host);
                     for (int i = 0; i < create.Responses.Count; i++)
@@ -517,7 +517,7 @@ namespace schedulesUnitedHosted.Server.Controllers
                 MySqlCommand createInvite = new MySqlCommand($"INSERT INTO Invites (eventID, accountID) VALUES ({survey}, {id})", con);
                 createInvite.ExecuteNonQuery();
                 con.Close();
-            } 
+            }
         }
     }
 }

@@ -6,10 +6,10 @@
 @inject HttpClient Http;
 @inject NavigationManager NavigationManager;
 
-<h3>Organizer Dashboard</h3>
+<h3>Participant Dashboard</h3>
 
 <RadzenCard>
-    <RadzenDataList WrapItems="true" AllowPaging="true" Data="@surveys" TItem="Survey" PageSize="5" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true">
+    <RadzenDataList WrapItems="true" LoadData="@LoadData" @ref=@dataList AllowPaging="true" Data="@surveys" TItem="Survey" PageSize="5" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true">
         <Template Context="survey">
             <RadzenCard Style="width: 100%; padding: 0; overflow: hidden;">
                 <div class="container">
@@ -44,6 +44,38 @@
             </RadzenCard>
         </Template>
     </RadzenDataList>
+    <RadzenDataList WrapItems="true" LoadData="@LoadData" @ref=@dataListResp AllowPaging="true" Data="@surveysResp" TItem="Survey" PageSize="5" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true">
+        <Template Context="survey">
+            <RadzenCard Style="width: 100%; padding: 0; overflow: hidden;">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-3 p-3 product-title">
+                            @(survey.name)
+                        </div>
+                        <div class="col-lg-7 p-3">
+                            <div class="row d-flex">
+                                <div class="col-md-6 col-lg-2">
+                                    <h5 class="mb-0">Host</h5>
+                                    <p class="mb-sm-2 mb-lg-0">@(survey.host)</p>
+                                </div>
+                                <div class="col-md-6 col-lg-2">
+                                    <h5 class="mb-0">DateType</h5>
+                                    <p class="mb-sm-2 mb-lg-0">@(survey.dateType)</p>
+                                </div>
+                                <div class="col-md-6 col-lg-5">
+                                    <h5 class="mb-0">Start</h5>
+                                    <p class="mb-sm-2 mb-lg-0">@(survey.start)</p>
+                                </div>
+                                <div class="col-md-6 order-first order-lg-last col-lg-3 text-sm-left text-lg-right mb-3 mb-lg-0">
+                                    <RadzenBadge BadgeStyle="BadgeStyle.Secondary" Class="price-badge" Text=@(survey.Responses.Count.ToString()) />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </RadzenCard>
+        </Template>
+    </RadzenDataList>
 </RadzenCard>
 
 
@@ -71,16 +103,12 @@
 
     [Parameter]
     public string ParticipantID { get; set; }
+    RadzenDataList<Survey> dataList;
+    RadzenDataList<Survey> dataListResp;
 
-    IList<Survey> surveys = new List<Survey> {
 
-        new Survey(45, "survey 1", DateTime.Today, DateTime.Today.AddDays(1), 410, new List<Response>()),
-        new Survey(46, "survey 2", DateTime.Today, DateTime.Today.AddDays(1), 420, new List<Response>()),
-        new Survey(47, "survey 3", DateTime.Today, DateTime.Today.AddDays(1), 430, new List<Response>()),
-        new Survey(48, "survey 4", DateTime.Today, DateTime.Today.AddDays(1), 440, new List<Response>()),
-        new Survey(49, "survey 5", DateTime.Today, DateTime.Today.AddDays(1), 450, new List<Response>()),
-        new Survey(50, "survey 6", DateTime.Today, DateTime.Today.AddDays(1), 460, new List<Response>())
-    };
+    IList<Survey> surveys = new List<Survey>();
+    IList<Survey> surveysResp = new List<Survey>();
 
     public async Task OnClick(Survey survey)
     {
@@ -92,6 +120,10 @@
                new DialogOptions() { Width = "100%", Height = "100%", Resizable = true, Draggable = true });
     }
 
+    async Task LoadData(LoadDataArgs args)
+    {
+    }
+
     async protected override void OnInitialized()
     {
         //function to get surveys
@@ -101,14 +133,28 @@
 
         try
         {
-            Console.WriteLine("getting id");
             int respUser = await Http.GetFromJsonAsync<int>($"user/id/{ParticipantID}");
-            Console.WriteLine("got id");
 
 
-            Console.WriteLine("getting surveys");
-            surveys = await Http.GetFromJsonAsync<List<Survey>>($"survey/invited/nonresponded/{respUser}");
-            Console.WriteLine("got sruveys");
+            var notRespSurveys = await Http.GetFromJsonAsync<List<int>>($"survey/invited/nonresponded/{respUser}");
+
+            foreach (int notRespSurvey in notRespSurveys)
+            {
+                var sur = await Http.GetFromJsonAsync<Survey>($"survey/{notRespSurvey}");
+                surveys.Add(sur);
+            }
+
+            var respSurveys = await Http.GetFromJsonAsync<List<int>>($"survey/invited/responded/{respUser}");
+
+            foreach (int respSurvey in respSurveys)
+            {
+                var sur = await Http.GetFromJsonAsync<Survey>($"survey/{respSurvey}");
+                surveysResp.Add(sur);
+            }
+
+            await dataList.Reload();
+            await dataListResp.Reload();
+
             //Console.WriteLine(resp);
         }
         catch (Exception ex)
