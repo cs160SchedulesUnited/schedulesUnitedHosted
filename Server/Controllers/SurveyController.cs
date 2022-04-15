@@ -514,7 +514,7 @@ namespace schedulesUnitedHosted.Server.Controllers
             using (con)
             {
                 con.Open();
-                MySqlCommand createInvite = new MySqlCommand($"INSERT INTO Invites VALUES (NULL, NULL, {survey}, {id})", con);
+                MySqlCommand createInvite = new MySqlCommand($"INSERT INTO Invites (eventID, accountID) VALUES ({survey}, {id})", con);
                 createInvite.ExecuteNonQuery();
                 con.Close();
             } 
