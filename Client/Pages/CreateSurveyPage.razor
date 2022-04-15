@@ -1,4 +1,4 @@
-﻿@page "/createSurvey/{organizerID}"
+﻿@page "/createSurvey/{organizerUserName}"
 @using Radzen.Blazor
 @inject HttpClient Http;
 @inject NavigationManager NavigationManager;
@@ -76,7 +76,7 @@
 @code {
 
     [Parameter]
-    public string OrganizerID { get; set; }
+    public string OrganizerUserName { get; set; }
 
 
     string value;
@@ -92,7 +92,8 @@
         {
 
 
-            survey.host = await Http.GetFromJsonAsync<int>($"user/id/{OrganizerID}");
+           
+            survey.host = await Http.GetFromJsonAsync<int>($"user/id/{OrganizerUserName}");
             Console.WriteLine(survey.ToString());
 
 
@@ -104,7 +105,11 @@
                 var resp = await Http.PostAsJsonAsync<schedulesUnitedHosted.Shared.Survey>("survey/create", survey);
                 //Console.WriteLine(resp);
 
+
                 Console.WriteLine(resp);
+
+                survey.id = await Http.GetFromJsonAsync<int>($"survey/{survey.name}/{survey.host}");
+
 
 
                 ////TEST
@@ -115,14 +120,14 @@
                 {
                     //should be post
                     Console.WriteLine(inviteeID);
-                    var exists = await Http.GetFromJsonAsync<User>($"user/info/{inviteeID}");
-                    Console.WriteLine(exists);
+                    //var exists = await Http.GetFromJsonAsync<User>($"user/info/{inviteeID}");
+                    //Console.WriteLine(exists);
                     Console.WriteLine("invite");
                     var respInvite = await Http.PostAsJsonAsync<int>($"survey/invite/{inviteeID}", survey.id);
-                     Console.WriteLine(respInvite);
+                    Console.WriteLine(respInvite);
                 }
 
-                var user = await Http.GetFromJsonAsync<User>($"user/info/{OrganizerID}");
+                var user = await Http.GetFromJsonAsync<User>($"user/info/{OrganizerUserName}");
                 NavigationManager.NavigateTo($"/organizerDashboard/{user.accountID}");
 
 

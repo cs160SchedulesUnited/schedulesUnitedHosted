@@ -115,8 +115,8 @@
             surveys = ressurveys.ToList();
 
 
-            //await InvokeAsync(StateHasChanged);
-            //await dataList.FirstPage();
+            await InvokeAsync(StateHasChanged);
+            await dataList.FirstPage();
             await dataList.Reload();
             //Console.WriteLine(resp);
         }
