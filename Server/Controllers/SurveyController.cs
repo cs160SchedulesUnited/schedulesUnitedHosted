@@ -405,9 +405,9 @@ namespace schedulesUnitedHosted.Server.Controllers
          */
         [HttpPost("create")]
         [Consumes("application/json")]
-        public void CreateSurvey([FromBody] Survey create)
+        public Boolean CreateSurvey([FromBody] Survey create)
         {
-            
+                Boolean fin = true;
                 string conString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
                 DBCon conGen = new DBCon(conString);
                 MySqlConnection con = conGen.GetConnection();
@@ -429,7 +429,7 @@ namespace schedulesUnitedHosted.Server.Controllers
                         createResponse(create.Responses[i]);
                     }
                 }
-           
+                return fin;
         }
 
         // POST <SurveyController>/edit
