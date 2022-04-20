@@ -1,0 +1,47 @@
+﻿@page "/inviteParticipants/{organizerUserName}/{surveyID}"
+@inject HttpClient Http;
+
+@using schedulesUnitedHosted.Shared
+@inject NavigationManager NavigationManager;
+<h3>Invite Your Participants</h3>
+<RadzenCard>
+    <div class="col-md-8">
+        <RadzenTextArea @bind-Value="value" Placeholder="Separate by comma" Class="w-100" />
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-md-12 d-flex align-items-end justify-content-center" style="margin-top: 16px;">
+            <RadzenButton ButtonType="ButtonType.Submit" Icon="save" Text="Invite" Click="@Submit" />
+
+        </div>
+    </div>
+</RadzenCard>
+
+@code {
+
+    [Parameter]
+    public string SurveyID { get; set; }
+
+    [Parameter]
+    public string OrganizerUserName { get; set; }
+
+    string value;
+
+    async void Submit()
+    {
+        List<string> inviteeIDs = value.Replace(" ", "").Split(',').ToList();
+
+        foreach (string inviteeID in inviteeIDs)
+        {
+            //should be post
+            Console.WriteLine(inviteeID);
+            //var exists = await Http.GetFromJsonAsync<User>($"user/info/{inviteeID}");
+            //Console.WriteLine(exists);
+            Console.WriteLine("invite");
+            var respInvite = await Http.PostAsJsonAsync<int>($"survey/invite/{inviteeID}", int.Parse(SurveyID));
+            Console.WriteLine(respInvite);
+        }
+
+        var user = await Http.GetFromJsonAsync<User>($"user/info/{OrganizerUserName}");
+        NavigationManager.NavigateTo($"/organizerDashboard/{user.accountID}");
+    }
+}

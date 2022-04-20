@@ -60,9 +60,7 @@
         <div class="col-md-4 align-items-center d-flex">
             <RadzenLabel Text="Invitees" />
         </div>
-        <div class="col-md-8">
-            <RadzenTextArea @bind-Value="value" Placeholder="Separate by comma" Class="w-100" />
-        </div>
+        
     </div>
     <div class="row justify-content-center">
         <div class="col-md-12 d-flex align-items-end justify-content-center" style="margin-top: 16px;">
@@ -92,7 +90,7 @@
         {
 
 
-           
+
             survey.host = await Http.GetFromJsonAsync<int>($"user/id/{OrganizerUserName}");
             Console.WriteLine(survey.ToString());
 
@@ -110,25 +108,8 @@
 
                 survey.id = await Http.GetFromJsonAsync<int>($"survey/{survey.name}/{survey.host}");
 
+                NavigationManager.NavigateTo($"/inviteParticipants/{OrganizerUserName}/{survey.id}");
 
-
-                ////TEST
-                ///
-                List<string> inviteeIDs = value.Replace(" ", "").Split(',').ToList();
-
-                foreach (string inviteeID in inviteeIDs)
-                {
-                    //should be post
-                    Console.WriteLine(inviteeID);
-                    //var exists = await Http.GetFromJsonAsync<User>($"user/info/{inviteeID}");
-                    //Console.WriteLine(exists);
-                    Console.WriteLine("invite");
-                    var respInvite = await Http.PostAsJsonAsync<int>($"survey/invite/{inviteeID}", survey.id);
-                    Console.WriteLine(respInvite);
-                }
-
-                var user = await Http.GetFromJsonAsync<User>($"user/info/{OrganizerUserName}");
-                NavigationManager.NavigateTo($"/organizerDashboard/{user.accountID}");
 
 
             }

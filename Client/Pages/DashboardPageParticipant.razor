@@ -140,7 +140,8 @@
 
             foreach (int notRespSurvey in notRespSurveys)
             {
-                var sur = await Http.GetFromJsonAsync<Survey>($"survey/{notRespSurvey}");
+                var sur = await Http.GetFromJsonAsync<Survey>($"survey/survey/{notRespSurvey}");
+                Console.WriteLine(sur);
                 surveys.Add(sur);
             }
 
@@ -148,7 +149,7 @@
 
             foreach (int respSurvey in respSurveys)
             {
-                var sur = await Http.GetFromJsonAsync<Survey>($"survey/{respSurvey}");
+                var sur = await Http.GetFromJsonAsync<Survey>($"survey/survey/{respSurvey}");
                 surveysResp.Add(sur);
             }
 
