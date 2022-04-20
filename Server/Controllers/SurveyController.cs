@@ -360,8 +360,10 @@ namespace schedulesUnitedHosted.Server.Controllers
          */
         [HttpPost("respond")]
         [Consumes("application/json")]
-        public void createResponse([FromBody] Response create)
+        [Produces("application/json")]
+        public Boolean createResponse([FromBody] Response create)
         {
+            Boolean fin = true;
             string conString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
             DBCon conGen = new DBCon(conString);
             MySqlConnection con = conGen.GetConnection();
@@ -374,6 +376,7 @@ namespace schedulesUnitedHosted.Server.Controllers
                 createSurvey.ExecuteNonQuery();
                 con.Close();
             }
+            return fin;
         }
 
         // POST <SurveyController>/delete
@@ -383,8 +386,10 @@ namespace schedulesUnitedHosted.Server.Controllers
          */
         [HttpPost("delete")]
         [Consumes("application/json")]
-        public void deleteResponse([FromBody] Response delete)
+        [Produces("application/json")]
+        public Boolean deleteResponse([FromBody] Response delete)
         {
+            Boolean fin = true;
             string conString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
             DBCon conGen = new DBCon(conString);
             MySqlConnection con = conGen.GetConnection();
@@ -397,6 +402,7 @@ namespace schedulesUnitedHosted.Server.Controllers
                 deleteSurvey.ExecuteNonQuery();
                 con.Close();
             }
+            return fin;
         }
 
         // POST <SurveyController>/create
@@ -405,6 +411,7 @@ namespace schedulesUnitedHosted.Server.Controllers
          */
         [HttpPost("create")]
         [Consumes("application/json")]
+        [Produces("application/json")]
         public Boolean CreateSurvey([FromBody] Survey create)
         {
                 Boolean fin = true;
@@ -438,8 +445,10 @@ namespace schedulesUnitedHosted.Server.Controllers
          */
         [HttpPost("edit")]
         [Consumes("application/json")]
-        public void EditSurvey([FromBody] UserSurvey combined)
+        [Produces("application/json")]
+        public Boolean EditSurvey([FromBody] UserSurvey combined)
         {
+            Boolean fin = true;
             User owner = combined.user;
             Survey edit = combined.survey;
             User cleaned = DBCon.Clean(owner);
@@ -457,6 +466,7 @@ namespace schedulesUnitedHosted.Server.Controllers
                     con.Close();
                 }
             }
+            return fin;
         }
 
         // POST <SurveyController>/delete/{id}
@@ -466,8 +476,10 @@ namespace schedulesUnitedHosted.Server.Controllers
          */
         [HttpPost("delete/{id:int}")]
         [Consumes("application/json")]
-        public void DeleteSurvey(int id, [FromBody] User owner)
+        [Produces("application/json")]
+        public Boolean DeleteSurvey(int id, [FromBody] User owner)
         {
+            Boolean fin = true;
             User cleaned = DBCon.Clean(owner);
             var survey = getOneSurvey(id);
             if (survey != null)
@@ -497,6 +509,7 @@ namespace schedulesUnitedHosted.Server.Controllers
             {
                 throw new Exception("Survey doesn't exist");
             }
+            return fin;
         }
 
         // POST <SurveyController>/invite/{id}
@@ -506,8 +519,10 @@ namespace schedulesUnitedHosted.Server.Controllers
          */
         [HttpPost("invite/{id:int}")]
         [Consumes("application/json")]
-        public void inviteUser(int id, [FromBody] int survey)
+        [Produces("application/json")]
+        public Boolean inviteUser(int id, [FromBody] int survey)
         {
+            Boolean fin = true;
             string conString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
             DBCon conGen = new DBCon(conString);
             MySqlConnection con = conGen.GetConnection();
@@ -518,6 +533,7 @@ namespace schedulesUnitedHosted.Server.Controllers
                 createInvite.ExecuteNonQuery();
                 con.Close();
             }
+            return fin;
         }
     }
 }

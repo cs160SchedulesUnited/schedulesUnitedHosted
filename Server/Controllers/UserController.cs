@@ -111,8 +111,10 @@ namespace schedulesUnitedHosted.Server.Controllers
          */
         [HttpPost("create")]
         [Consumes("application/json")]
-        public void createUser([FromBody] User person)
+        [Produces("application/json")]
+        public Boolean createUser([FromBody] User person)
         {
+            Boolean fin = true;
             User cleaned = DBCon.Clean(person);
             User ret = null;
             string conString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
@@ -144,6 +146,7 @@ namespace schedulesUnitedHosted.Server.Controllers
                 }
                 con.Close();
             }
+            return fin;
         }
 
         // POST <UserController>/delete
@@ -153,8 +156,10 @@ namespace schedulesUnitedHosted.Server.Controllers
          */
         [HttpPost("delete")]
         [Consumes("application/json")]
-        public void deleteUser([FromBody] User person)
+        [Produces("application/json")]
+        public Boolean deleteUser([FromBody] User person)
         {
+            Boolean fin = true;
             User cleaned = DBCon.Clean(person);
             User ret = null;
             string conString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
@@ -178,6 +183,7 @@ namespace schedulesUnitedHosted.Server.Controllers
                     con.Close();
                 }
             }
+            return fin;
         }
 
         // POST <UserController>/validate
@@ -188,6 +194,7 @@ namespace schedulesUnitedHosted.Server.Controllers
          */
         [HttpPost("validate")]
         [Consumes("application/json")]
+        [Produces("application/json")]
         public Boolean Validate([FromBody] User person)
         {
             Utilities util = new Utilities();
