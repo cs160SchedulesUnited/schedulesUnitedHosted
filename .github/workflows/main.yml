@@ -1,5 +1,6 @@
 name: Deploy to GitHub Pages
-
+env:
+  DB_CONNECTION_STRING: ${{ secrets.DB_CONNECTION_STRING }}
 # Run workflow on every push to the master branch
 on:
   push:
