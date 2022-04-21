@@ -1,4 +1,4 @@
-﻿@page "/inviteParticipants/{organizerUserName}/{surveyID}"
+﻿@page "/inviteParticipants/{organizerUserName}/{surveyName}"
 @inject HttpClient Http;
 
 @using schedulesUnitedHosted.Shared
@@ -19,7 +19,7 @@
 @code {
 
     [Parameter]
-    public string SurveyID { get; set; }
+    public string SurveyName { get; set; }
 
     [Parameter]
     public string OrganizerUserName { get; set; }
@@ -28,7 +28,9 @@
 
     async void Submit()
     {
+        var user = await Http.GetFromJsonAsync<User>($"user/{OrganizerUserName}");
         List<string> inviteeIDs = value.Replace(" ", "").Split(',').ToList();
+        var surveyId = await Http.GetFromJsonAsync<int>($"survey/survey/{SurveyName}/{user.accountID}");
 
         foreach (string inviteeID in inviteeIDs)
         {
@@ -37,11 +39,10 @@
             //var exists = await Http.GetFromJsonAsync<User>($"user/info/{inviteeID}");
             //Console.WriteLine(exists);
             Console.WriteLine("invite");
-            var respInvite = await Http.PostAsJsonAsync<int>($"survey/invite/{inviteeID}", int.Parse(SurveyID));
+            var respInvite = await Http.PostAsJsonAsync<int>($"survey/invite/{inviteeID}", surveyId);
             Console.WriteLine(respInvite);
         }
 
-        var user = await Http.GetFromJsonAsync<User>($"user/info/{OrganizerUserName}");
         NavigationManager.NavigateTo($"/organizerDashboard/{user.accountID}");
     }
 }
