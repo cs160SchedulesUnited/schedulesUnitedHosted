@@ -106,9 +106,9 @@
 
                 Console.WriteLine(resp);
 
-                survey.id = await Http.GetFromJsonAsync<int>($"survey/{survey.name}/{survey.host}");
+                //survey.id = await Http.GetFromJsonAsync<int>($"survey/{survey.name}/{survey.host}");
 
-                NavigationManager.NavigateTo($"/inviteParticipants/{OrganizerUserName}/{survey.id}");
+                NavigationManager.NavigateTo($"/inviteParticipants/{OrganizerUserName}/{survey.name}");
 
 
 
