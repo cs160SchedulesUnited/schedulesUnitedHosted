@@ -523,12 +523,20 @@ namespace schedulesUnitedHosted.Server.Controllers
         public Boolean inviteUser(int id, [FromBody] int survey)
         {
             Boolean fin = true;
+            int ret = -1;
             string conString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
             DBCon conGen = new DBCon(conString);
             MySqlConnection con = conGen.GetConnection();
             using (con)
             {
                 con.Open();
+                MySqlCommand check = new MySqlCommand($"SELECT * FROM Invites WHERE eventID = {survey} AND accountID = { id }", con);
+                using (var reader = check.ExecuteReader())
+                    while (reader.Read())
+                    {
+                        ret = Int32.Parse(reader["accountID"].ToString());
+                    }
+                if (ret == -1) return false;
                 MySqlCommand createInvite = new MySqlCommand($"INSERT INTO Invites (eventID, accountID) VALUES ({survey}, {id})", con);
                 createInvite.ExecuteNonQuery();
                 con.Close();
