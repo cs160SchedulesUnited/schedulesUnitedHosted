@@ -9,6 +9,7 @@
 <h3>Participant Dashboard</h3>
 
 <RadzenCard>
+    <h3>Not Yet Responded</h3>
     <RadzenDataList WrapItems="true" LoadData="@LoadData" @ref=@dataList AllowPaging="true" Data="@surveys" TItem="Survey" PageSize="5" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true">
         <Template Context="survey">
             <RadzenCard Style="width: 100%; padding: 0; overflow: hidden;">
@@ -49,6 +50,7 @@
             </RadzenCard>
         </Template>
     </RadzenDataList>
+    <h3>Responded Surveys</h3>
     <RadzenDataList WrapItems="true" LoadData="@LoadData" @ref=@dataListResp AllowPaging="true" Data="@surveysResp" TItem="Survey" PageSize="5" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true">
         <Template Context="survey">
             <RadzenCard Style="width: 100%; padding: 0; overflow: hidden;">
@@ -130,7 +132,6 @@
 
     public async Task OnClick(Survey survey)
     {
-        Console.WriteLine(survey.ToString());
         //take id to next page
         //NavigationManager.NavigateTo($"/responsePage/{surveyId}");
         await DialogService.OpenAsync<ResponsePage>($"Name {survey.name}",
@@ -159,8 +160,7 @@
             foreach (int notRespSurvey in notRespSurveys)
             {
                 var sur = await Http.GetFromJsonAsync<Survey>($"survey/survey/{notRespSurvey}");
-                //sur.host = GetHost(ParticipantID);
-                Console.WriteLine(sur);
+
                 surveys.Add(sur);
             }
 
@@ -193,12 +193,10 @@
 
     void Open(string title, Type type, Dictionary<string, object> parameters, DialogOptions options)
     {
-        Console.WriteLine("Dialog opened");
     }
 
     void Close(dynamic result)
     {
-        Console.WriteLine($"Dialog closed");
     }
 
 

@@ -2,41 +2,43 @@
 @using Radzen.Blazor
 @inject HttpClient Http;
 @using schedulesUnitedHosted.Shared;
-
-
+@inject NavigationManager NavigationManager;
+@inject TooltipService tooltipService;
 @inject Radzen.DialogService DialogService;
 
-<h3>Component1</h3>
+<div class="col">
+    <RadzenButton Style="margin-bottom:30px;" Click=DeleteSurvey MouseEnter="@(args => ShowConfirm(args))" Text="Delete" Icon="report" ButtonStyle="ButtonStyle.Danger" />
+    <RadzenButton Style="margin-bottom:30px;" Click=EditSurvey MouseEnter="@(args => ShowConfirmEdit(args))" Text="Edit" Icon="refresh" ButtonStyle="ButtonStyle.Warning" />
+    </div>
+    <RadzenScheduler Data="@appointmentss" Style="height: 700px; padding-bottom: 30px;" TItem="Appointment" TextProperty="Text" SlotRender="@OnSlotRender" AppointmentRender=@OnAppointmentRender StartProperty="Start" AppointmentSelect=@OnAppointmentSelect EndProperty="End">
+        <RadzenMonthView />
+    </RadzenScheduler>
+    <div style="width: 100%;">
+        <RadzenCard Style="float: left; width: 50%; height: 100%;">
+            <h4>Responded</h4>
+            <RadzenListBox Data=@respondedList TValue="string" LoadData="@LoadData" Style="max-height: 200px;" />
+        </RadzenCard>
+        <RadzenCard Style=" width: 50%; height: 100%;">
+            <h4>Not Yet Responded</h4>
+            <RadzenListBox Data=@notRespondedList TValue="string" LoadData="@LoadData" Style="max-height: 200px;" />
+        </RadzenCard>
+    </div>
 
-<RadzenScheduler Data="@appointmentss" Style="height: 700px; padding-bottom: 30px;" TItem="Appointment" TextProperty="Text" SlotRender="@OnSlotRender" AppointmentRender=@OnAppointmentRender StartProperty="Start" AppointmentSelect=@OnAppointmentSelect EndProperty="End">
-    <RadzenMonthView />
-</RadzenScheduler>
-<div style="width: 100%;">
-    <RadzenCard Style="float: left; width: 50%; height: 100%;">
-        <h4>Responded</h4>
-        <RadzenListBox Data=@respondedList TValue="string" Style="max-height: 200px;" />
-    </RadzenCard>
-    <RadzenCard Style=" width: 50%; height: 100%;">
-        <h4>Not Yet Responded</h4>
-        <RadzenListBox Data=@notRespondedList TValue="string" Style="max-height: 200px;" />
-    </RadzenCard>
-</div>
+    @code {
 
-@code { 
+            [Parameter] public Survey survey { get; set; }
+            RadzenListBox<string> listBox;
 
-    [Parameter] public Survey survey { get; set; }
-    RadzenListBox<string> listBox;
+        class Appointment
+        {
+            public DateTime Start { get; set; }
+            public DateTime End { get; set; }
+            public string Text { get; set; }
+        }
 
-    class Appointment
-    {
-        public DateTime Start { get; set; }
-        public DateTime End { get; set; }
-        public string Text { get; set; }
-    }
+        IList<Response> appointments = new List<Response>();
 
-    IList<Response> appointments = new List<Response>();
-
-    IList<Appointment> appointmentss = new List<Appointment>
+        IList<Appointment> appointmentss = new List<Appointment>
 {
         new Appointment { Start = DateTime.Today.AddDays(-2), End = DateTime.Today.AddDays(-2), Text = "Birthday" },
         new Appointment { Start = DateTime.Today.AddDays(-11), End = DateTime.Today.AddDays(-10), Text = "Day off" },
@@ -46,109 +48,134 @@
         new Appointment { Start = DateTime.Today.AddHours(14), End = DateTime.Today.AddHours(14).AddMinutes(30), Text = "Dentist appointment" },
         new Appointment { Start = DateTime.Today.AddDays(1), End = DateTime.Today.AddDays(12), Text = "Vacation" },
     };
-    //NOT ALLOWED TO HAVE DUPLICATE VALUES IN RESPONDED AND NON RESPONDED LIST
-    IEnumerable<string> notRespondedList = new List<string>();
-    IEnumerable<string> respondedList = new List<string>();
+        //NOT ALLOWED TO HAVE DUPLICATE VALUES IN RESPONDED AND NON RESPONDED LIST
+        IList<string> notRespondedList = new List<string>();
+        IList<string> respondedList = new List<string>();
 
-    void OnAppointmentRender(SchedulerAppointmentRenderEventArgs<Appointment> args)
-    {
-
-        args.Attributes["style"] = "background: rgb(56, 176, 218)";
-
-
-
-    }
-
-    void OnSlotRender(SchedulerSlotRenderEventArgs args)
+        void OnAppointmentRender(SchedulerAppointmentRenderEventArgs<Appointment> args)
         {
-        if (args.Start < survey.start || args.Start > survey.end)
+
+            args.Attributes["style"] = "background: rgb(56, 176, 218)";
+
+
+
+
+        }
+        void ShowConfirm(ElementReference elementReference, TooltipOptions options = null)
+        {
+            tooltipService.Open(elementReference, "This action cannot be undone", options);
+        }
+        void ShowConfirmEdit(ElementReference elementReference, TooltipOptions options = null)
+        {
+        }
+
+        async void DeleteSurvey()
+        {
+        }
+
+        async void EditSurvey()
+        {
+            Console.WriteLine(survey.host);
+            var user = await Http.GetFromJsonAsync<User>($"user/info/{survey.host}");
+            Console.WriteLine(user.toString());
+
+            var survDel = await Http.PostAsJsonAsync<User>($"survey/delete/{survey.id}", user);
+
+            //Load();
+            NavigationManager.NavigateTo($"/organizerDashboard/{user.username}", true);
+        }
+
+        void OnSlotRender(SchedulerSlotRenderEventArgs args)
+        {
+            if (args.Start < survey.start || args.Start > survey.end)
             {
-            args.Attributes["style"] = "background: DarkGray";
+                args.Attributes["style"] = "background: DarkGray";
             }
         }
 
-async Task LoadData(LoadDataArgs args)
-    {
-
-    }
-
-
-    async protected override void OnInitialized()
-    {
-        try
+        async Task LoadData(LoadDataArgs args)
         {
-            //Console.WriteLine("getting id");
-            var apps = await Http.GetFromJsonAsync<List<Response>>($"survey/responses/{survey.id}");
-            IList<Appointment> responses = new List<Appointment>();
-            // calc best days
 
-        @*var query = apps.GroupBy(x => x.Availability.ToString("yyyy-MM-dd"))
-            .Select(group => new { Location = group.Key, Count = group.Count() })
-            .OrderByDescending(x => x.Count);*@
-        var query = apps.GroupBy(x => x.Availability.ToString("yyyy-MM-dd")).OrderByDescending(x => x.Count());
-
-        query.ToList().ForEach(g => responses.Add(new Appointment { Start = DateTime.ParseExact(g.Key, "yyyy-MM-dd", null), End = DateTime.ParseExact(g.Key, "yyyy-MM-dd", null), Text = $"Available: {g.Count()}" }));
-
-        appointmentss = responses;
-
-        //var query = apps.GroupBy(i => i.Availability.ToString("yyyy-MM-dd"));
-
-
-        var totalPpl = await Http.GetFromJsonAsync<List<int>>($"survey/invite/{survey.id}");
-        var notRespondedPpl = await Http.GetFromJsonAsync<List<int>>($"survey/invite/nonresponded/{survey.id}");
-
-
-
-        foreach (int notRespondedPerson in notRespondedPpl)
-        {
-            var person = await Http.GetFromJsonAsync<User>($"user/info/{notRespondedPerson}");
-            notRespondedList.Append(person.name);
         }
 
-        var respondedPpl = totalPpl.Where(p => notRespondedPpl.All(p2 => p2 != p));
 
-        foreach (int respondedPerson in respondedPpl)
+        async protected override void OnInitialized()
         {
-            var person = await Http.GetFromJsonAsync<User>($"user/info/{respondedPerson}");
-            respondedList.Append(person.name);
+            try
+            {
+                //Console.WriteLine("getting id");
+                var apps = await Http.GetFromJsonAsync<List<Response>>($"survey/responses/{survey.id}");
+                IList<Appointment> responses = new List<Appointment>();
+                // calc best days
+
+                @*var query = apps.GroupBy(x => x.Availability.ToString("yyyy-MM-dd"))
+                    .Select(group => new { Location = group.Key, Count = group.Count() })
+                    .OrderByDescending(x => x.Count);*@
+                var query = apps.GroupBy(x => x.Availability.ToString("yyyy-MM-dd")).OrderByDescending(x => x.Count());
+
+                query.ToList().ForEach(g => responses.Add(new Appointment { Start = DateTime.ParseExact(g.Key, "yyyy-MM-dd", null), End = DateTime.ParseExact(g.Key, "yyyy-MM-dd", null), Text = $"Available: {g.Count()}" }));
+
+                appointmentss = responses;
+
+                //var query = apps.GroupBy(i => i.Availability.ToString("yyyy-MM-dd"));
+
+
+                var totalPpl = await Http.GetFromJsonAsync<List<int>>($"survey/invite/{survey.id}");
+                var notRespondedPpl = await Http.GetFromJsonAsync<List<int>>($"survey/invite/nonresponded/{survey.id}");
+
+
+                foreach (int notRespondedPerson in notRespondedPpl)
+                {
+                    var person = await Http.GetFromJsonAsync<User>($"user/info/{notRespondedPerson}");
+                    notRespondedList.Add(person.name);
+
+                }
+
+                var respondedPpl = totalPpl.Where(p => notRespondedPpl.All(p2 => p2 != p));
+
+                foreach (int respondedPerson in respondedPpl)
+                {
+                    respondedList.Append(respondedPerson.ToString());
+                    var person = await Http.GetFromJsonAsync<User>($"user/info/{respondedPerson}");
+                    respondedList.Add(person.name);
+                }
+
+
+                await InvokeAsync(StateHasChanged);
+
+
+            }
+            catch (Exception ex)
+            {
+
+                Console.WriteLine(ex.Message + "\n" + ex.StackTrace);
+            }
+
         }
 
-        await InvokeAsync(StateHasChanged);
+        async Task OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<Appointment> args)
+        {
 
+            var responses = await Http.GetFromJsonAsync<List<Response>>($"survey/responses/{survey.id}/{args.Start.ToString("yyyy-MM-dd")}");
+            IList<string> names = new List<string>();
+
+            foreach (Response response in responses)
+            {
+                //get names of user from id of each
+                var user = await Http.GetFromJsonAsync<User>($"user/info/{response.AccId}");
+
+                names.Add(user.name);
+            }
+
+            var result = await DialogService.OpenAsync("Simple Dialog", ds =>
+        @<div>
+            <RadzenCard Style=" width: 50%; height: 100%;">
+                <p>Responded</p>
+                <RadzenListBox TValue="string" Data=@names Style="max-height: 100px;" />
+            </RadzenCard>
+        </div>);
+
+  }
 
 
     }
-    catch (Exception ex)
-    {
-
-        Console.WriteLine(ex.Message + "\n" + ex.StackTrace);
-    }
-
-}
-
-async Task OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<Appointment> args)
-{
-
-    var responses = await Http.GetFromJsonAsync<List<Response>>($"survey/responses/{survey.id}/{args.Start.ToString("yyyy-MM-dd")}");
-    IList<string> names = new List<string>();
-
-    foreach (Response response in responses)
-    {
-        //get names of user from id of each
-        var user = await Http.GetFromJsonAsync<User>($"info/{response.AccId}");
-
-        names.Add(user.name);
-    }
-
-    var result = await DialogService.OpenAsync("Simple Dialog", ds =>
-    @<div>
-        <RadzenCard Style=" width: 50%; height: 100%;">
-            <p>Responded</p>
-            <RadzenListBox TValue="string" Data=@names Style="max-height: 100px;" />
-        </RadzenCard>
-    </div>);
-
-}
-
-
-}
