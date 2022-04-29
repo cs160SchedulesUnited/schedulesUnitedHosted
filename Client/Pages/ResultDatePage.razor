@@ -8,8 +8,9 @@
 
 <div class="col">
     <RadzenButton Style="margin-bottom:30px;" Click=DeleteSurvey MouseEnter="@(args => ShowConfirm(args))" Text="Delete" Icon="report" ButtonStyle="ButtonStyle.Danger" />
+    <RadzenButton Style="margin-bottom:30px;" Click=InvitePart MouseEnter="@(args => ShowConfirmInvite(args))" Text="Invite" Icon="privacy_tip" ButtonStyle="ButtonStyle.Info" />
     <RadzenButton Style="margin-bottom:30px;" Click=EditSurvey MouseEnter="@(args => ShowConfirmEdit(args))" Text="Edit" Icon="refresh" ButtonStyle="ButtonStyle.Warning" />
-    </div>
+</div>
     <RadzenScheduler Data="@appointmentss" Style="height: 700px; padding-bottom: 30px;" TItem="Appointment" TextProperty="Text" SlotRender="@OnSlotRender" AppointmentRender=@OnAppointmentRender StartProperty="Start" AppointmentSelect=@OnAppointmentSelect EndProperty="End">
         <RadzenMonthView />
     </RadzenScheduler>
@@ -68,8 +69,14 @@
         void ShowConfirmEdit(ElementReference elementReference, TooltipOptions options = null)
         {
         }
+        void ShowConfirmInvite(ElementReference elementReference, TooltipOptions options = null)
+        {
+        }
 
         async void DeleteSurvey()
+        {
+        }
+        async void InvitePart()
         {
         }
 
