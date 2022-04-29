@@ -536,7 +536,7 @@ namespace schedulesUnitedHosted.Server.Controllers
                     {
                         ret = Int32.Parse(reader["accountID"].ToString());
                     }
-                if (ret == -1) return false;
+                if (ret == id) return false;
                 MySqlCommand createInvite = new MySqlCommand($"INSERT INTO Invites (eventID, accountID) VALUES ({survey}, {id})", con);
                 createInvite.ExecuteNonQuery();
                 con.Close();
