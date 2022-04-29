@@ -21,8 +21,8 @@
 
 @code {
 
-        [Parameter] public int survey { get; set; }
-        [Parameter] public string partID { get; set; }
+    [Parameter] public int survey { get; set; }
+    [Parameter] public string partID { get; set; }
 
     public Survey surveyFull = new Survey();
     RadzenScheduler<Appointment> scheduler;
@@ -36,22 +36,25 @@
     IList<Appointment> appointments = new List<Appointment>();
 
 
-    protected override void OnInitialized()
+    async protected override void OnInitialized()
     {
+        surveyFull = await Http.GetFromJsonAsync<Survey>($"survey/survey/{survey}");
+        scheduler.Reload();
     }
 
     public async Task OnClick()
     {
+        var participantInfo = await Http.GetFromJsonAsync<User>($"user/{partID}");
 
         foreach (Appointment appointment in appointments)
         {
 
             try
             {
-                var participantInfo = await Http.GetFromJsonAsync<User>($"user/{partID}");
-                surveyFull = await Http.GetFromJsonAsync<Survey>($"survey/{survey}");
                 Response r = new Response(participantInfo.accountID, surveyFull.id, appointment.Start, 0);
+                Console.WriteLine(r.ToString());
                 var respUser = await Http.PostAsJsonAsync<Response>($"survey/respond", r);
+                dialogService.Close();
             }
             catch (Exception ex)
             {
@@ -62,27 +65,20 @@
     }
     void OnSlotRender(SchedulerSlotRenderEventArgs args)
     {
-        // DOESNT WORK PLS FIX
-        @*if (args.Start < surveyFull.start || args.Start > surveyFull.end)
+        if (args.Start < surveyFull.start || args.Start > surveyFull.end)
         {
             args.Attributes["style"] = "background: DarkGray";
-        }*@
+        }
     }
 
 
     async Task OnSlotSelect(SchedulerSlotSelectEventArgs args)
     {
-        //DOESNT WORK PLS FIX
-        @*if (args.Start >= surveyFull.start && args.Start <= surveyFull.end)
-        {*@
+        if (args.Start >= surveyFull.start && args.Start <= surveyFull.end)
+        {
 
-
-            @*if (appointments.Any(a => a.Start != args.Start))
-            {*@
-                appointments.Add(new Appointment { Start = args.Start, End = args.End, Text = "Busy" });
-
-            //}
-        @*}*@
+            appointments.Add(new Appointment { Start = args.Start, End = args.End, Text = "Available" });
+        }
         await scheduler.Reload();
 
     }
