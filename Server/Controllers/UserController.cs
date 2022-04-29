@@ -45,12 +45,12 @@ namespace schedulesUnitedHosted.Server.Controllers
         }
 
         // This API should not be used for validation
-        // GET <UserController>/{userID}
+        // GET <UserController>/info/{userID}
         /**
          * <param name="userID">The userID of the desired user information is to be included in the URL</param>
          * <returns>A User with accountID, personName, userName, and password</returns>
          */
-        [HttpGet("info/{userID:int}")]
+        [HttpGet("info/{userID}")]
         [Produces("application/json")]
         public User getUserInfo(int userID)
         {

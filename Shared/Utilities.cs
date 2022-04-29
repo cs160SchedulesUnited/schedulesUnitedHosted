@@ -7,7 +7,7 @@ namespace schedulesUnitedHosted.Shared
 {
     public class Utilities
     {
-        public List<intDate> getAvailablilityList(List<Response> availabilities, int OwnerId)
+        public List<intDate> getOwnerAvailablilityList(List<Response> availabilities, int OwnerId)
         {
             List<intDate> list = new List<intDate>();
             foreach (Response r in availabilities)
@@ -29,6 +29,28 @@ namespace schedulesUnitedHosted.Shared
                 }
             }
             return list;
+        }
+
+        public List<intDate> getTimesOpen(List<Response> availabilities)
+        {
+            List<intDate> res = new List<intDate>();
+            foreach(Response r in availabilities)
+            {
+                DateTime a = r.Availability.AddHours(r.Hour);
+                Predicate<intDate> test = b => b.date == a.Date;
+                intDate match = res.Find(test);
+                if(match == null)
+                {
+                    int length = res.Count - 1;
+                    res[length] = new intDate(1, a);
+                }
+                else
+                {
+                    int index = res.IndexOf(match);
+                    res[index].num++;
+                }
+            }
+            return res;
         }
 
         public int getNumberResponders(List<Response> availabilities)
