@@ -26,21 +26,29 @@
                                 <h5 class="mb-0">Host</h5>
                                 <p class="mb-sm-2 mb-lg-0">@(survey.host)</p>
                             </div>
-                            <div class="col-md-6 col-lg-2">
+                            <!--<div class="col-md-6 col-lg-2">
                                 <h5 class="mb-0">DateType</h5>
                                 <p class="mb-sm-2 mb-lg-0">@(survey.dateType)</p>
-                            </div>
+                            </div>-->
                             <div class="col-md-6 col-lg-5">
                                 <h5 class="mb-0">Start</h5>
                                 <p class="mb-sm-2 mb-lg-0">@(survey.start)</p>
                             </div>
+                            <div class="col-md-6 col-lg-5">
+                                <h5 class="mb-0">End</h5>
+                                <p class="mb-sm-2 mb-lg-0">@(survey.end)</p>
+                            </div>
                             <div class="col-md-6 order-first order-lg-last col-lg-3 text-sm-left text-lg-right mb-3 mb-lg-0">
+                                <h5 class="mb-0">Responses</h5>
                                 <RadzenBadge BadgeStyle="BadgeStyle.Secondary" Class="price-badge" Text=@(survey.Responses.Count.ToString()) />
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-2 p-3">
                         <RadzenButton Text="Manage" Click="@(args => OnClick(survey))" Class="w-100" />
+                    </div>
+                    <div class="col-lg-2 p-3">
+                        <RadzenButton Text="Delete" Click="@(args => OnClickDelete(survey.id))" Class="w-100" />
                     </div>
                 </div>
             </div>
@@ -90,6 +98,13 @@
         await DialogService.OpenAsync<ResultDatePage>($"Name {survey.name}",
                new Dictionary<string, object>() { { "survey", survey } },
                new DialogOptions() { Width = "100%", Height = "100%", Resizable = true, Draggable = true });
+    }
+
+    public async Task OnClickDelete(int surveyID)
+    {
+        User organizer = await Http.GetFromJsonAsync<schedulesUnitedHosted.Shared.User>($"user/{OrganizerID}");
+        var resp = await Http.PostAsJsonAsync<schedulesUnitedHosted.Shared.User>($"survey/delete/{surveyID}", organizer);
+        NavigationManager.NavigateTo($"/organizerDashboard/{OrganizerID}");
     }
 
     async Task LoadData(LoadDataArgs args)

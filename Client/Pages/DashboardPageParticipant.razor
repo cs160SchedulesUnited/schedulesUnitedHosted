@@ -23,15 +23,20 @@
                                     <h5 class="mb-0">Host</h5>
                                     <p class="mb-sm-2 mb-lg-0">@(survey.host)</p>
                                 </div>
-                                <div class="col-md-6 col-lg-2">
+                                <!--<div class="col-md-6 col-lg-2">
                                     <h5 class="mb-0">DateType</h5>
                                     <p class="mb-sm-2 mb-lg-0">@(survey.dateType)</p>
-                                </div>
+                                </div>-->
                                 <div class="col-md-6 col-lg-5">
                                     <h5 class="mb-0">Start</h5>
                                     <p class="mb-sm-2 mb-lg-0">@(survey.start)</p>
                                 </div>
+                                <div class="col-md-6 col-lg-5">
+                                    <h5 class="mb-0">End</h5>
+                                    <p class="mb-sm-2 mb-lg-0">@(survey.end)</p>
+                                </div>
                                 <div class="col-md-6 order-first order-lg-last col-lg-3 text-sm-left text-lg-right mb-3 mb-lg-0">
+                                    <h5 class="mb-0">Responses</h5>
                                     <RadzenBadge BadgeStyle="BadgeStyle.Secondary" Class="price-badge" Text=@(survey.Responses.Count.ToString()) />
                                 </div>
                             </div>
@@ -58,15 +63,20 @@
                                     <h5 class="mb-0">Host</h5>
                                     <p class="mb-sm-2 mb-lg-0">@(survey.host)</p>
                                 </div>
-                                <div class="col-md-6 col-lg-2">
+                                <!--<div class="col-md-6 col-lg-2">
                                     <h5 class="mb-0">DateType</h5>
                                     <p class="mb-sm-2 mb-lg-0">@(survey.dateType)</p>
-                                </div>
+                                </div>-->
                                 <div class="col-md-6 col-lg-5">
                                     <h5 class="mb-0">Start</h5>
                                     <p class="mb-sm-2 mb-lg-0">@(survey.start)</p>
                                 </div>
+                                <div class="col-md-6 col-lg-5">
+                                    <h5 class="mb-0">End</h5>
+                                    <p class="mb-sm-2 mb-lg-0">@(survey.end)</p>
+                                </div>
                                 <div class="col-md-6 order-first order-lg-last col-lg-3 text-sm-left text-lg-right mb-3 mb-lg-0">
+                                    <h5 class="mb-0">Responses</h5>
                                     <RadzenBadge BadgeStyle="BadgeStyle.Secondary" Class="price-badge" Text=@(survey.Responses.Count.ToString()) />
                                 </div>
                             </div>
@@ -110,6 +120,14 @@
     IList<Survey> surveys = new List<Survey>();
     IList<Survey> surveysResp = new List<Survey>();
 
+
+
+    async Task<string> GetHost(int id)
+    {
+        User respUser = await Http.GetFromJsonAsync<User>($"info/{id}");
+        return respUser.username;
+    }
+
     public async Task OnClick(Survey survey)
     {
         Console.WriteLine(survey.ToString());
@@ -141,6 +159,7 @@
             foreach (int notRespSurvey in notRespSurveys)
             {
                 var sur = await Http.GetFromJsonAsync<Survey>($"survey/survey/{notRespSurvey}");
+                //sur.host = GetHost(ParticipantID);
                 Console.WriteLine(sur);
                 surveys.Add(sur);
             }

@@ -14,6 +14,11 @@ namespace schedulesUnitedHosted.Shared
 
         public int Hour { get; set; }
 
+        public Response()
+        {
+
+        }
+
         public Response(int AccId, int EventId, DateTime Availability, int Hour)
         {
             this.AccId = AccId;
