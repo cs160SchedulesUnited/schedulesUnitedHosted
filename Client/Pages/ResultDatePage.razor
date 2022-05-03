@@ -8,8 +8,9 @@
 
 <div class="col">
     <RadzenButton Style="margin-bottom:30px;" Click=DeleteSurvey MouseEnter="@(args => ShowConfirm(args))" Text="Delete" Icon="report" ButtonStyle="ButtonStyle.Danger" />
-    <RadzenButton Style="margin-bottom:30px;" Click=EditSurvey MouseEnter="@(args => ShowConfirmEdit(args))" Text="Edit" Icon="refresh" ButtonStyle="ButtonStyle.Warning" />
-    </div>
+    <RadzenButton Style="margin-bottom:30px;" Click=EditSurvey  Text="Edit" Icon="refresh" ButtonStyle="ButtonStyle.Warning" />
+    <RadzenButton Style="margin-bottom:30px;" Click=InviteSurvey  Text="Invite" Icon="add_circle_outline" ButtonStyle="ButtonStyle.Info" />
+</div>
     <RadzenScheduler Data="@appointmentss" Style="height: 700px; padding-bottom: 30px;" TItem="Appointment" TextProperty="Text" SlotRender="@OnSlotRender" AppointmentRender=@OnAppointmentRender StartProperty="Start" AppointmentSelect=@OnAppointmentSelect EndProperty="End">
         <RadzenMonthView />
     </RadzenScheduler>
@@ -26,8 +27,8 @@
 
     @code {
 
-            [Parameter] public Survey survey { get; set; }
-            RadzenListBox<string> listBox;
+        [Parameter] public Survey survey { get; set; }
+        RadzenListBox<string> listBox;
 
         class Appointment
         {
@@ -65,24 +66,33 @@
         {
             tooltipService.Open(elementReference, "This action cannot be undone", options);
         }
-        void ShowConfirmEdit(ElementReference elementReference, TooltipOptions options = null)
-        {
-        }
 
         async void DeleteSurvey()
         {
-        }
 
-        async void EditSurvey()
-        {
-            Console.WriteLine(survey.host);
             var user = await Http.GetFromJsonAsync<User>($"user/info/{survey.host}");
-            Console.WriteLine(user.toString());
 
             var survDel = await Http.PostAsJsonAsync<User>($"survey/delete/{survey.id}", user);
 
             //Load();
             NavigationManager.NavigateTo($"/organizerDashboard/{user.username}", true);
+        }
+
+        async void InviteSurvey()
+        {
+            var user = await Http.GetFromJsonAsync<User>($"user/info/{survey.host}");
+
+            NavigationManager.NavigateTo($"/inviteParticipants/{user.username}/{survey.name}");
+        }
+
+        async void EditSurvey()
+        {
+
+            var user = await Http.GetFromJsonAsync<User>($"user/info/{survey.host}");
+
+            
+            //Load();
+            NavigationManager.NavigateTo($"/editSurvey/{user.username}/{survey.name}", true);
         }
 
         void OnSlotRender(SchedulerSlotRenderEventArgs args)
