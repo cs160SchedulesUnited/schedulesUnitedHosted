@@ -22,7 +22,7 @@
                             <div class="row d-flex">
                                 <div class="col-md-6 col-lg-2">
                                     <h5 class="mb-0">Host</h5>
-                                    <p class="mb-sm-2 mb-lg-0">@(survey.host)</p>
+                                    <p class="mb-sm-2 mb-lg-0">@(survey.hostName)</p>
                                 </div>
                                 <!--<div class="col-md-6 col-lg-2">
                                     <h5 class="mb-0">DateType</h5>
@@ -63,7 +63,7 @@
                             <div class="row d-flex">
                                 <div class="col-md-6 col-lg-2">
                                     <h5 class="mb-0">Host</h5>
-                                    <p class="mb-sm-2 mb-lg-0">@(survey.host)</p>
+                                    <p class="mb-sm-2 mb-lg-0">@(survey.hostName)</p>
                                 </div>
                                 <!--<div class="col-md-6 col-lg-2">
                                     <h5 class="mb-0">DateType</h5>
@@ -160,8 +160,9 @@
             foreach (int notRespSurvey in notRespSurveys)
             {
                 var sur = await Http.GetFromJsonAsync<Survey>($"survey/survey/{notRespSurvey}");
-
-                surveys.Add(sur);
+                String hostName = await GetHost(sur.host);
+                Survey toAdd = new Survey(sur, hostName);
+                surveys.Add(toAdd);
             }
 
             var respSurveys = await Http.GetFromJsonAsync<List<int>>($"survey/invited/responded/{respUser}");
