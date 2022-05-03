@@ -1,0 +1,173 @@
+﻿@page "/editSurvey/{organizerUserName}/{surveyName}"
+@using Radzen.Blazor
+@inject HttpClient Http;
+@inject NavigationManager NavigationManager;
+@inject NotificationService NotificationService;
+
+
+@using schedulesUnitedHosted.Shared
+
+<h1>Create Survey for participants</h1>
+
+<RadzenCard>
+
+    <div class="row">
+        <div class="col-md-4 align-items-center d-flex">
+            <RadzenLabel Text="Name" />
+        </div>
+        <div class="col-md-8">
+            <RadzenTextBox @bind-Value="survey.name" />
+        </div>
+    </div>
+    @*<div class="row">
+            <div class="col-md-4 align-items-center d-flex">
+                <RadzenLabel Text="Email" />
+            </div>
+            <div class="col-md-8">
+                <RadzenTextBox @bind-Value="survey.email" Class="w-100" />
+            </div>
+        </div>*@
+    <div class="row">
+        <div class="col-md-4 align-items-center d-flex">
+            <RadzenLabel Text="Start Date" />
+        </div>
+        <div class="col-md-8">
+            <RadzenDatePicker @bind-Value='survey.start' Inline="true" DateFormat="d" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 align-items-center d-flex">
+            <RadzenLabel Text="End Date" />
+        </div>
+        <div class="col-md-8">
+            <RadzenDatePicker @bind-Value='survey.end' Inline="true" DateFormat="d" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 align-items-center d-flex">
+            <RadzenLabel Text="Response Type" />
+        </div>
+        <div class="col-md-8">
+            <RadzenRadioButtonList @bind-Value='survey.dateType' TValue="int" Orientation="Orientation.Vertical">
+                <Items>
+                    <RadzenRadioButtonListItem Text="Date" Value="1" />
+                    <RadzenRadioButtonListItem Text="Time" Value="2" />
+                </Items>
+            </RadzenRadioButtonList>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 align-items-center d-flex">
+            <RadzenLabel Text="Invitees" />
+        </div>
+
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-md-12 d-flex align-items-end justify-content-center" style="margin-top: 16px;">
+            <RadzenButton ButtonType="ButtonType.Submit" Icon="save" Text="Submit" Click="@Submit" />
+
+        </div>
+    </div>
+</RadzenCard>
+
+
+@code {
+
+    [Parameter]
+    public string OrganizerUserName { get; set; }
+
+    [Parameter]
+    public string SurveyName { get; set; }
+
+
+    string value;
+
+
+    Survey survey = new Survey();
+
+
+
+    async Task LoadData(LoadDataArgs args)
+    {
+    }
+
+    protected async override void OnInitialized()
+    {
+
+
+
+        //////////// TEST
+        ///
+        try
+        {
+            int respUser = await Http.GetFromJsonAsync<int>($"user/id/{OrganizerUserName}");
+            var surveyId = await Http.GetFromJsonAsync<int>($"survey/survey/{SurveyName}/{respUser}");
+
+            survey = await Http.GetFromJsonAsync<Survey>($"survey/survey/{surveyId}");
+            Console.WriteLine($"survey {survey.name}");
+            await InvokeAsync(StateHasChanged);
+
+            //Console.WriteLine(resp);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message + "\n" + ex.StackTrace);
+        }
+
+
+    }
+
+
+
+
+
+    async void Submit()
+    {
+        //survey.host = int.Parse(OrganizerID);
+
+        if (survey.end > survey.start)
+        {
+
+
+
+            var host = await Http.GetFromJsonAsync<User>($"user/{OrganizerUserName}");
+            survey.host = host.accountID;
+
+
+            //////////// TEST
+
+            try
+            {
+                UserSurvey us = new UserSurvey(survey, host);
+
+                Console.WriteLine(survey.ToString());
+                Console.WriteLine(host.ToString());
+                var resp = await Http.PostAsJsonAsync<schedulesUnitedHosted.Shared.UserSurvey>("survey/edit", us);
+                //Console.WriteLine(resp);
+
+
+                Console.WriteLine(resp);
+
+                //survey.id = await Http.GetFromJsonAsync<int>($"survey/{survey.name}/{survey.host}");
+
+                NavigationManager.NavigateTo($"/organizerDashboard/{OrganizerUserName}");
+
+
+
+            }
+            catch (Exception ex)
+            {
+                var resp = ex.Message + "\n" + ex.StackTrace;
+                Console.WriteLine(resp);
+            }
+        }
+        else
+        {
+            var message = new NotificationMessage { Severity = NotificationSeverity.Error, Summary = "Failure", Detail = "End survey date must be after start date", Duration = 4000 };
+            NotificationService.Notify(message);
+        }
+
+    }
+
+
+}

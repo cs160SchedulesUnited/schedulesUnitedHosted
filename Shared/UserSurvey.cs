@@ -16,5 +16,9 @@ namespace schedulesUnitedHosted.Shared
             user = u;
             survey = s;
         }
+        public string toString()
+        {
+            return $"user: {user.toString()}, survey: {survey.ToString()}";
+        }
     }
 }

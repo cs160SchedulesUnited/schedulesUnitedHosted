@@ -18,7 +18,7 @@
         <RadzenCard Style="width: 100%; padding: 0; overflow: hidden;">
             <div class="container">
                 <div class="row">
-                    <div class="col-lg-3 p-3 product-title">
+                    <div class="col-lg-3 p-3 product-title" style="color: black; background-color: #99cce7;">
                         @(survey.name)
                     </div>
                     <div class="col-lg-7 p-3">
@@ -31,14 +31,14 @@
                                 <h5 class="mb-0">DateType</h5>
                                 <p class="mb-sm-2 mb-lg-0">@(survey.dateType)</p>
                             </div>-->
-                            <div class="col-md-6 col-lg-5">
+                            @*<div class="col-md-6 col-lg-5">
                                 <h5 class="mb-0">Start</h5>
                                 <p class="mb-sm-2 mb-lg-0">@(survey.start)</p>
                             </div>
                             <div class="col-md-6 col-lg-5">
                                 <h5 class="mb-0">End</h5>
                                 <p class="mb-sm-2 mb-lg-0">@(survey.end)</p>
-                            </div>
+                            </div>*@
                             <div class="col-md-6 order-first order-lg-last col-lg-3 text-sm-left text-lg-right mb-3 mb-lg-0">
                                 <h5 class="mb-0">Responses</h5>
                                 <RadzenBadge BadgeStyle="BadgeStyle.Secondary" Class="price-badge" Text=@(survey.numResponses.ToString()) />
@@ -48,9 +48,9 @@
                     <div class="col-lg-2 p-3">
                         <RadzenButton Text="Manage" Click="@(args => OnClick(survey))" Class="w-100" />
                     </div>
-                    <div class="col-lg-2 p-3">
+                    @*<div class="col-lg-2 p-3">
                         <RadzenButton Text="Delete" Click="@(args => OnClickDelete(survey.id))" Class="w-100" />
-                    </div>
+                    </div>*@
                 </div>
             </div>
         </RadzenCard>
@@ -96,7 +96,7 @@
         Console.WriteLine(survey.ToString());
         //take id to next page
         //NavigationManager.NavigateTo($"/responsePage/{surveyId}");
-        await DialogService.OpenAsync<ResultDatePage>($"Name {survey.name}",
+        await DialogService.OpenAsync<ResultDatePage>($"{survey.name}",
                new Dictionary<string, object>() { { "survey", survey } },
                new DialogOptions() { Width = "100%", Height = "100%", Resizable = true, Draggable = true });
     }
