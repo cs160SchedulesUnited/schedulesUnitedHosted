@@ -22,7 +22,7 @@
                             <div class="row d-flex">
                                 <div class="col-md-6 col-lg-2">
                                     <h5 class="mb-0">Host</h5>
-                                    <p class="mb-sm-2 mb-lg-0">@(survey.host)</p>
+                                    <p class="mb-sm-2 mb-lg-0">@(survey.hostName)</p>
                                 </div>
                                 <!--<div class="col-md-6 col-lg-2">
                                     <h5 class="mb-0">DateType</h5>
@@ -38,7 +38,7 @@
                                 </div>*@
                                 <div class="col-md-6 order-first order-lg-last col-lg-3 text-sm-left text-lg-right mb-3 mb-lg-0">
                                     <h5 class="mb-0">Responses</h5>
-                                    <RadzenBadge BadgeStyle="BadgeStyle.Secondary" Class="price-badge" Text=@(survey.Responses.Count.ToString()) />
+                                    <RadzenBadge BadgeStyle="BadgeStyle.Secondary" Class="price-badge" Text=@(survey.numResponses.ToString()) />
                                 </div>
                             </div>
                         </div>
@@ -63,7 +63,7 @@
                             <div class="row d-flex">
                                 <div class="col-md-6 col-lg-2">
                                     <h5 class="mb-0">Host</h5>
-                                    <p class="mb-sm-2 mb-lg-0">@(survey.host)</p>
+                                    <p class="mb-sm-2 mb-lg-0">@(survey.hostName)</p>
                                 </div>
                                 <!--<div class="col-md-6 col-lg-2">
                                     <h5 class="mb-0">DateType</h5>
@@ -79,7 +79,7 @@
                                 </div>
                                 <div class="col-md-6 order-first order-lg-last col-lg-3 text-sm-left text-lg-right mb-3 mb-lg-0">
                                     <h5 class="mb-0">Responses</h5>
-                                    <RadzenBadge BadgeStyle="BadgeStyle.Secondary" Class="price-badge" Text=@(survey.Responses.Count.ToString()) />
+                                    <RadzenBadge BadgeStyle="BadgeStyle.Secondary" Class="price-badge" Text=@(survey.numResponses.ToString()) />
                                 </div>
                             </div>
                         </div>
@@ -159,8 +159,9 @@
 
             foreach (int notRespSurvey in notRespSurveys)
             {
-                var sur = await Http.GetFromJsonAsync<Survey>($"survey/survey/{notRespSurvey}");
-
+                var sur = await Http.GetFromJsonAsync<Survey>($"survey/surveywh/{notRespSurvey}");
+                //String hostName = await GetHost(sur.host);
+                //Survey toAdd = new Survey(sur, hostName);
                 surveys.Add(sur);
             }
 

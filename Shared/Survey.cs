@@ -20,6 +20,10 @@ namespace schedulesUnitedHosted.Shared
 
         public int dateType { get; set; } = 1;
 
+        public string hostName { get; set; } = null;
+
+        public int numResponses { get; set; } = 0;
+
         public Survey(int id, string name, DateTime start, DateTime end, int host, List<Response> Responses)
         {
             this.Responses = Responses;
@@ -70,7 +74,16 @@ namespace schedulesUnitedHosted.Shared
             this.dateType = dateType;
         }
 
-
+        public Survey(int id, string name, DateTime start, DateTime end, int host, List<Response> Responses, string hostName)
+        {
+            this.Responses = Responses;
+            this.start = start;
+            this.end = end;
+            this.host = host;
+            this.id = id;
+            this.name = name;
+            this.hostName = hostName;
+        }
 
         public Survey() { }
 

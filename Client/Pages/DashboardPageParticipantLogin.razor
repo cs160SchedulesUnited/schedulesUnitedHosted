@@ -79,7 +79,7 @@
                 <div style="margin:25px;">
                     <RadzenPassword @bind-Value="@user.RPassword" Name="RPassword" Placeholder="Confirm password" Class="w-100" />
                     <RadzenRequiredValidator Component="RPassword" Text="Confirm Password is required" Popup=true Style="position: absolute" />
-                    <RadzenCompareValidator Value=@user.Password Component="RPassword" Text="Passwords should be the same" Popup=true Style="position: absolute" />
+                    <RadzenCompareValidator Visible=@(!string.IsNullOrEmpty(user.RPassword)) Value=@user.Password Component="RPassword" Text="Passwords should be the same" Popup=true Style="position: absolute" />
                 </div>
                 <RadzenButton ButtonType="ButtonType.Submit" Style="margin: 25px;" Text="Submit" />
             </RadzenFieldset>

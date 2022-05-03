@@ -37,9 +37,11 @@
             //should be post
             Console.WriteLine(inviteeID);
             //var exists = await Http.GetFromJsonAsync<User>($"user/info/{inviteeID}");
+            var thisUser = await Http.GetFromJsonAsync<User>($"user/{inviteeID}");
             //Console.WriteLine(exists);
             Console.WriteLine("invite");
-            var respInvite = await Http.PostAsJsonAsync<int>($"survey/invite/{inviteeID}", surveyId);
+            //var respInvite = await Http.PostAsJsonAsync<int>($"survey/invite/{inviteeID}", surveyId);
+            var respInvite = await Http.PostAsJsonAsync<int>($"survey/invite/{thisUser.accountID}", surveyId);
             Console.WriteLine(respInvite);
         }
 
