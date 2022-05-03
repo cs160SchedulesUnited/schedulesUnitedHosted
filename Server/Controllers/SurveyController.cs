@@ -114,8 +114,11 @@ namespace schedulesUnitedHosted.Server.Controllers
                         DateTime end = DateTime.Parse(reader["endDate"].ToString());
                         int host = Int32.Parse(reader["eventHost"].ToString());
                         List<Response> responses = getAllResponses(Int32.Parse(reader["eventID"].ToString()));
-
-                        ret.Add(new Survey(id, name, start, end, host, responses));
+                        int attendees = getNumAttedees(id);
+                        Survey toAdd = new Survey(id, name, start, end, host, responses);
+                        toAdd.numResponses = attendees;
+                        //ret.Add(new Survey(id, name, start, end, host, responses));
+                        ret.Add(toAdd);
                         i++;
                     }
                 con.Close();
@@ -152,8 +155,79 @@ namespace schedulesUnitedHosted.Server.Controllers
                         DateTime end = DateTime.Parse(reader["endDate"].ToString());
                         int host = Int32.Parse(reader["eventHost"].ToString());
                         List<Response> responses = getAllResponses(Int32.Parse(reader["eventID"].ToString()));
-
+                        int attendees = getNumAttedees(surveyID);
                         ret = new Survey(id, name, start, end, host, responses);
+                        ret.numResponses = attendees;
+                    }
+                con.Close();
+            }
+            return ret;
+        }
+
+        // GET <SurveyController>/survey/{surveyID}
+        /**
+         * <param name="surveyID">The id of the survey being requested</param>
+         * <returns>The survey object with the provided ID</returns>
+         */
+        [HttpGet("attendees/{surveyID:int}")]
+        [Produces("application/json")]
+        public int getNumAttedees(int surveyID)
+        {
+            int cleaned = surveyID;
+            Survey ret = null;
+            string conString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
+
+            DBCon conGen = new DBCon(conString);
+            MySqlConnection con = conGen.GetConnection();
+
+            using (con)
+            {
+                con.Open();
+                MySqlCommand getSurvey = new MySqlCommand($"select count(distinct accountID) as c from Availabilities where eventID = {cleaned}", con);
+                using (var reader = getSurvey.ExecuteReader())
+                    while (reader.Read())
+                    {
+                        int c = Int32.Parse(reader["c"].ToString());
+                        return c;
+                    }
+                con.Close();
+            }
+            return 0;
+        }
+
+        // GET <SurveyController>/survey/{surveyID}
+        /**
+         * <param name="surveyID">The id of the survey being requested</param>
+         * <returns>The survey object with the provided ID</returns>
+         */
+        [HttpGet("surveywh/{surveyID:int}")]
+        [Produces("application/json")]
+        public Survey getOneSurveyWithHost(int surveyID)
+        {
+            int cleaned = surveyID;
+            Survey ret = null;
+            string conString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
+
+            DBCon conGen = new DBCon(conString);
+            MySqlConnection con = conGen.GetConnection();
+
+            using (con)
+            {
+                con.Open();
+                MySqlCommand getSurvey = new MySqlCommand($"Select eventID, eventName, startDate, endDate, eventHost, username from CalendarEvents inner join Accounts on CalendarEvents.eventHost = Accounts.accountID where eventID = {cleaned}", con);
+                using (var reader = getSurvey.ExecuteReader())
+                    while (reader.Read())
+                    {
+                        int id = Int32.Parse(reader["eventID"].ToString());
+                        string name = reader["eventName"].ToString();
+                        DateTime start = DateTime.Parse(reader["startDate"].ToString());
+                        DateTime end = DateTime.Parse(reader["endDate"].ToString());
+                        int host = Int32.Parse(reader["eventHost"].ToString());
+                        List<Response> responses = getAllResponses(Int32.Parse(reader["eventID"].ToString()));
+                        string username = reader["username"].ToString();
+                        int attendees = getNumAttedees(surveyID);
+                        ret = new Survey(id, name, start, end, host, responses, username);
+                        ret.numResponses = attendees;
                     }
                 con.Close();
             }
@@ -493,9 +567,11 @@ namespace schedulesUnitedHosted.Server.Controllers
                     {
                         con.Open();
                         //Delete survey
-                        MySqlCommand deleteSurvey = new MySqlCommand($"DELETE FROM CalendarEvents WHERE eventID = {id}", con);
+                        MySqlCommand deleteSurvey = new MySqlCommand($"DELETE FROM Availabilities WHERE eventID = {id}", con);
                         deleteSurvey.ExecuteNonQuery();
-                        deleteSurvey = new MySqlCommand($"DELETE FROM Availabilities WHERE eventID = {id}", con);
+                        deleteSurvey = new MySqlCommand($"DELETE FROM Invites WHERE eventID = {id}", con);
+                        deleteSurvey.ExecuteNonQuery();
+                        deleteSurvey = new MySqlCommand($"DELETE FROM CalendarEvents WHERE eventID = {id}", con);
                         deleteSurvey.ExecuteNonQuery();
                         con.Close();
                     }
